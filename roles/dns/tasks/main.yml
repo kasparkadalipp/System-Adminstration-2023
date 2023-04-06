@@ -17,9 +17,11 @@
     permanent: true
     state: enabled
 
-- name: Reload firewall
-  ansible.posix.firewalld:
+- name: Reload service firewalld
+  systemd:
+    name: firewalld
     state: restarted
+  changed_when: false
 
 - name: DNS | Autoremove unneeded packages installed as dependencies
   dnf:
