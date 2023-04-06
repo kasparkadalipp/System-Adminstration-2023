@@ -1,0 +1,15 @@
+- hosts: vm
+  user: centos
+  become: yes
+  become_user: root
+  vars:
+  - hostname: b75914
+  - domain_name: sa.cs.ut.ee
+
+  roles:
+  - { role: etais, tags: etais } 
+  - { role: dns, tags: dns }
+
+  tasks:
+  - name: Testing this out
+    debug: msg="Hello from server!"
