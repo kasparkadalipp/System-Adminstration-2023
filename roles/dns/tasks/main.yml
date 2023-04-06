@@ -1,4 +1,6 @@
 ---
+
+# 3. Firewall - Open UDP and TCP port 53 for the lab
 - name: Add DNS service rule
   ansible.posix.firewalld:
       service: dns
@@ -23,6 +25,7 @@
     state: restarted
   changed_when: false
 
+# 4. Disable IPv6
 - name: DNS | Autoremove unneeded packages installed as dependencies
   dnf:
     autoremove: yes
@@ -49,6 +52,7 @@
     sysctl_file: /etc/sysctl.d/70-ipv6.conf
     reload: yes
 
+# 5. Domain Name System (DNS) using BIND software
 - name: Inserts into hostname
   template:
     src: hostname.j2
@@ -64,3 +68,87 @@
     owner: root
     group: root
     mode: '0644'
+
+# 6. Configuring the BIND Name Server
+
+- name: Install the latest version of bind
+  ansible.builtin.yum:
+    name: bind
+    state: latest
+
+- name: Install the latest version of bind-utils
+  ansible.builtin.yum:
+    name: bind-utils
+    state: present
+
+# Create directory for logging and necessary files
+- name: Create named log directory
+  file:
+    path: /var/named/log
+    state: directory
+    owner: named
+    group: named
+    mode: '0755'
+
+- name: Create default log file
+  file:
+    path: /var/named/log/
+    owner: named
+    group: named
+    mode: '0755'
+    access_time: preserve
+    modification_time: preserve 
+    state: touch
+  with_items:
+  - default
+  - auth_servers
+  - zone_transfers
+  - client_security
+  - queries
+  - query-errors
+
+- name: Configure DNS server /etc/named.conf
+  template:
+    src: named.conf.j2
+    dest: /etc/named.conf
+    owner: root
+    group: named
+    mode: '0640'
+
+- name: Create /etc/named directory
+  file:
+    path: /etc/named
+    state: directory
+    owner: named
+    group: named
+    mode: '0750'
+
+- name: Creating a Personal Domain for named {{dns_zone}}
+  template:
+    src: (vm_name).sa.cs.ut.ee.j2
+    dest: /etc/named/{{hostname}}.sa.cs.ut.ee
+    owner: root
+    group: named
+    mode: '0644'
+
+
+- name: Reverse DNS Domain for named {{reverse_dns}}
+  template:
+    src: (reversed_domain).in-addr.arpa.j2
+    dest: /etc/named/{{reverse_dns}}
+    owner: root
+    group: named
+    mode: '0644'
+
+
+- name: Stop named service
+  systemd:
+    name: named
+    state: stopped
+  changed_when: false
+
+- name: Start named service
+  systemd:
+    name: named
+    state: started
+  changed_when: false

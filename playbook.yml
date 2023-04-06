@@ -5,11 +5,12 @@
   vars:
   - hostname: b75914
   - domain_name: sa.cs.ut.ee
+  - ip_address: 172.17.91.139
 
   roles:
-  - { role: etais, tags: etais } 
+  # - { role: etais, tags: etais } 
   - { role: dns, tags: dns }
 
   tasks:
   - name: Testing this out
-    debug: msg="Hello from server!"
+    debug: msg="{{ ip_address.split('.')[-2::-1] | join('.') }}"

@@ -1,0 +1,13 @@
+;
+; BIND data file for local zone student-test.sa.cs.ut.ee;
+$TTL    15M
+@       IN      SOA     ns1.{{dns_zone}}. root.{{dns_zone}}. (
+                     2023030802         ; Serial
+                            15M         ; Refresh
+                             5M         ; Retry
+                           120M         ; Expire
+                            600 )       ; Negative Cache TTL
+@              IN      NS      ns1
+@              IN      A       172.17.91.139
+ns1            IN      A       172.17.91.139
+student-test   IN      A       172.17.91.139
