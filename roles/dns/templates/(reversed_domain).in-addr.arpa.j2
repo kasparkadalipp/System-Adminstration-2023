@@ -9,4 +9,4 @@ $TTL 15M             ; Default expiration time for all resources
         604800    ; Expire (7 days in seconds)
         600 )     ; Negative Cache TTL
 @              IN      NS      ns1.
-139            IN      PTR     {{dns_zone}}.
+{{last_octet}}            IN      PTR     {{dns_zone}}.
