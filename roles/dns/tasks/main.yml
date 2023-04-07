@@ -140,6 +140,14 @@
     group: named
     mode: '0644'
 
+- name: Update resolv.conf
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: '0644'
+
 - name: Stop named service
   systemd:
     name: named
@@ -150,4 +158,5 @@
   systemd:
     name: named
     state: started
+    enabled: true
   changed_when: false

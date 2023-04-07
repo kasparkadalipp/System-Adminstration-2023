@@ -5,22 +5,23 @@
   vars:
   - hostname: b75914
   - domain_name: sa.cs.ut.ee
+  - ip_address: 172.17.89.26
 
   pre_tasks:
   - name: Testing this out
     debug: msg="hello"
 
-  - name: Get OpenStack metadata
-    uri:
-      url: http://169.254.169.254/latest/meta-data/public-ipv4 
-      method: GET
-      status_code: 200
-      return_content: yes
-    register: cloud_metadata
+  # - name: Get OpenStack metadata
+  #   uri:
+  #     url: http://169.254.169.254/latest/meta-data/public-ipv4 
+  #     method: GET
+  #     status_code: 200
+  #     return_content: yes
+  #   register: cloud_metadata
 
-  - name: Create variable for IP address
-    set_fact:
-      ip_address: "{{ cloud_metadata.content }}"
+  # - name: Create variable for IP address
+  #   set_fact:
+  #     ip_address: "{{ cloud_metadata.content }}"
 
     
   roles:
