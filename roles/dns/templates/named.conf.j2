@@ -171,13 +171,13 @@ logging {
      category query-errors {query-errors_log; };
 };
 
-zone {{dns_zone}} IN {
+zone "{{dns_zone}}" IN {
         type master;
         file "/etc/named/{{dns_zone}}";
         allow-update { none; };
 };
 
-zone {{reverse_dns}} IN {
+zone "{{reverse_dns}}" IN {
         type master;
         file "/etc/named/{{reverse_dns}}";
         allow-update { none; };

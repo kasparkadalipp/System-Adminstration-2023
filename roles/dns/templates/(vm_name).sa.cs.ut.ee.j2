@@ -1,5 +1,5 @@
 ;
-; BIND data file for local zone student-test.sa.cs.ut.ee;
+; BIND data file for local zone {{dns_zone}};
 $TTL    15M
 @       IN      SOA     ns1.{{dns_zone}}. root.{{dns_zone}}. (
                      2023030802         ; Serial
@@ -10,4 +10,4 @@ $TTL    15M
 @              IN      NS      ns1
 @              IN      A       {{ip_address}}
 ns1            IN      A       {{ip_address}}
-student-test   IN      A       {{ip_address}}
+{{hostname}}   IN      A       {{ip_address}}
