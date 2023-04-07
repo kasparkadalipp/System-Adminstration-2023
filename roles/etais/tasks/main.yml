@@ -28,7 +28,7 @@
 - name: Create /etc/identity file
   template:
     src: identity.j2
-    dest: /etc/indentity
+    dest: /etc/identity
     owner: root
     group: root
     mode: '0644'

@@ -81,8 +81,7 @@
     name: bind-utils
     state: present
 
-# Create directory for logging and necessary files
-- name: Create named log directory
+- name: Create directory for logging
   file:
     path: /var/named/log
     state: directory
@@ -90,7 +89,7 @@
     group: named
     mode: '0755'
 
-- name: Create default log file
+- name: Create necessary files for logging
   file:
     path: /var/named/log/
     owner: named
@@ -106,6 +105,8 @@
   - client_security
   - queries
   - query-errors
+
+# Creating a Personal Domain for named
 
 - name: Configure DNS server /etc/named.conf
   template:
@@ -131,7 +132,6 @@
     group: named
     mode: '0644'
 
-
 - name: Reverse DNS Domain for named {{reverse_dns}}
   template:
     src: (reversed_domain).in-addr.arpa.j2
@@ -139,7 +139,6 @@
     owner: root
     group: named
     mode: '0644'
-
 
 - name: Stop named service
   systemd:

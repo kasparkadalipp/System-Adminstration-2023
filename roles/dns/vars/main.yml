@@ -2,7 +2,5 @@
 # B75914.sa.cs.ut.ee
 dns_zone: "{{hostname}}.sa.cs.ut.ee"
 
-# 91.17.172.in-addr.arpa.
+# 91.17.172.in-addr.arpa. (for ip 172.17.91.139)
 reverse_dns: "{{ ip_address.split('.')[-2::-1] | join('.') }}.in-addr.arpa"
-
-# systemctl restart named
