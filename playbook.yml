@@ -6,10 +6,11 @@
   - hostname: b75914
   - domain_name: sa.cs.ut.ee
   - ip_address: 172.17.89.26
+  - dns_zone: "{{hostname}}.sa.cs.ut.ee"
 
   pre_tasks:
   - name: Testing this out
-    debug: msg="hello"
+    debug: msg="Hello"
 
   # - name: Get OpenStack metadata
   #   uri:
@@ -25,5 +26,6 @@
 
     
   roles:
-  - { role: etais, tags: etais } 
+  # - { role: etais, tags: etais } 
   - { role: dns, tags: dns }
+  - { role: apache, tags: apache}
