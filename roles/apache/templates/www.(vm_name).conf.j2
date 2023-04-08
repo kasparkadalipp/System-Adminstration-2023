@@ -4,6 +4,6 @@
  # Possible values include: debug, info, notice, warn, error, crit, alert, emerg.
  LogLevel debug
 
- ErrorLog /var/log/httpd/{{hostname}}-error.log
- CustomLog /var/log/httpd/{{hostname}}-access.log combined
+ ErrorLog /var/log/httpd/www.{{hostname}}-error.log
+ CustomLog /var/log/httpd/www.{{hostname}}-access.log combined
 </VirtualHost>
