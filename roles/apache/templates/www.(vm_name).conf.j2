@@ -1,0 +1,9 @@
+<VirtualHost *:80>
+ ServerName www.{{dns_zone}}
+ DocumentRoot /var/www/html/www.{{hostname}}/public_html
+ # Possible values include: debug, info, notice, warn, error, crit, alert, emerg.
+ LogLevel debug
+
+ ErrorLog /var/log/httpd/{{hostname}}-error.log
+ CustomLog /var/log/httpd/{{hostname}}-access.log combined
+</VirtualHost>

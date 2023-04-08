@@ -1,0 +1,14 @@
+- name: Restart Apache
+  ansible.builtin.service:
+    name: httpd 
+    state: restarted
+
+- name: Restart firewall
+  systemd:
+    name: firewalld
+    state: restarted
+
+- name: Restart DNS
+  systemd:
+    name: named
+    state: restarted

@@ -1,0 +1,172 @@
+# 3.1 Understanding DNS CNAME records
+- name: Append cname to /etc/named/{{dns_zone}}
+  ansible.builtin.lineinfile:
+    path: /etc/named/{{dns_zone}}
+    state: present
+    regexp: "{{item}} IN CNAME {{dns_zone}}."
+    line: "{{item}} IN CNAME {{dns_zone}}."
+  register: cname
+  with_items:
+  - www
+  - proxy
+  - wordpress
+
+
+      
+- name: Update /etc/named/{{dns_zone}} serial
+  replace:
+    path: /etc/named/{{dns_zone}}
+    regexp: '\d{10}'
+    replace: "{{ lookup('pipe', 'date +%Y%m%d07') }}" # TODO better increment
+  when: cname.changed
+  notify:
+  - Restart DNS
+  - Restart Apache
+
+# 3.2 Virtual Web Hosts Using Apache Web Server
+- name: Install httpd using dnf
+  yum:
+    name: httpd
+    state: present
+
+- name: permit traffic on port 8301/tcp
+  ansible.posix.firewalld:
+    port: 80/tcp
+    permanent: true
+    state: enabled
+  notify:
+  - Restart firewall
+
+- name: Ensure apache is running
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: true
+
+- name: Create directory /var/www/html/www.{{hostname}}/public_html
+  file:
+    path: /var/www/html/www.{{hostname}}/public_html
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create /etc/httpd/conf.d/www.{{hostname}}.conf
+  template:
+    src: www.(vm_name).conf.j2
+    dest: /etc/httpd/conf.d/www.{{hostname}}.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create index.html for website
+  template:
+    src: index.html.j2
+    dest: /var/www/html/www.{{hostname}}/public_html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+  - Restart Apache
+
+# 3.3 Utilizing a web server as a proxy
+- name: Add user proxy
+  user:
+    name: proxy
+
+- name: Install python3-pip
+  dnf:
+    name: python3-pip
+
+- name: Install flask
+  pip:
+    name: flask
+
+- name: Create /root/website.py
+  template:
+    src: website.py.j2
+    dest: /root/website.py
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create /etc/httpd/conf.d/proxy.conf
+  template:
+    src: proxy.conf.j2
+    dest: /etc/httpd/conf.d/proxy.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Set httpd_can_network_connect flag on and keep it persistent across reboots
+  seboolean:
+    name: httpd_can_network_connect
+    state: true
+    persistent: yes
+
+
+# 3.1 Understanding DNS CNAME records
+
+
+# 4. Let's add a default WordPress setup to our current setup
+- name: Install WordPress packages
+  dnf:
+    name:
+    - php-mysqlnd
+    - php-fpm
+    - mariadb-server
+    - httpd
+    - tar
+    - curl
+    - php-json
+
+- name: Ensure MariaDB service is running
+  ansible.builtin.service:
+    name: mariadb
+    state: started
+    enabled: true
+
+# TODO  mysql_secure_installation
+# TODO SQL INSERT
+
+- name: Extract wordpress.tar.gz
+  unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: /var/www/html
+    remote_src: yes
+    creates: /var/www/html/wordpress
+
+- name: Set ownership of wordpress directory to apache user and group
+  file:
+    path: /var/www/html/wordpress
+    state: directory
+    owner: apache
+    group: apache
+    recurse: yes
+
+# chcon -t httpd_sys_rw_content_t /var/www/html/wordpress -R # TODO 
+
+- name: Create WordPress log file 
+  file:
+    path: /var/log/httpd/php-errors.log
+    owner: apache
+    group: root
+    mode: '0644'
+    access_time: preserve
+    modification_time: preserve 
+    state: touch
+
+- name: Combine WordPress PHP logs
+  replace:
+    path: "{{item.file}}"
+    regexp: "{{item.error_log}}"
+    replace: /var/log/httpd/php-errors.log
+  with_items:
+  - {file: /etc/php-fpm.d/www.conf, error_log: /var/log/php-fpm/www-error.log}
+  - {file: /etc/php-fpm.conf, error_log: /var/log/php-fpm/error.log}
+
+- name: Ensure MariaDB service is running
+  ansible.builtin.service:
+    name: php-fpm
+    state: started
+    enabled: true
