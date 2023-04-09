@@ -1,8 +1,9 @@
 <VirtualHost *:80>
     ServerName proxy.{{hostname}}.sa.cs.ut.ee
     # ServerName sets the name to listen for with requests
-    ErrorLog /var/log/httpd/proxy-error_log
-    CustomLog /var/log/httpd/proxy-access_log common
+    ErrorLog /var/log/httpd/proxy-error.log
+    CustomLog /var/log/httpd/proxy-access.log common
+    ForensicLog /var/log/httpd/proxy-forensic.log
 
     ProxyPreserveHost On
 

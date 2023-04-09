@@ -24,6 +24,7 @@
   #   set_fact:
   #     ip_address: "{{ cloud_metadata.content }}"
 
+
   roles:
   # - { role: etais, tags: etais } 
   # - { role: dns, tags: dns }

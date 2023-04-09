@@ -1,1 +1,3 @@
 mysql_root_password: pass
+mysql_login_user: root
+mysql_login_password: pass
