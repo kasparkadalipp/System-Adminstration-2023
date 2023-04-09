@@ -15,7 +15,7 @@
   replace:
     path: /etc/named/{{dns_zone}}
     regexp: '\d{10}'
-    replace: "{{ lookup('pipe', 'date +%Y%m%d02') }}" # TODO better increment
+    replace: "{{ lookup('pipe', 'date +%Y%m%d10') }}" # TODO better increment
   when: cname.changed
   notify:
   - Restart DNS
@@ -28,7 +28,7 @@
     state: present
 
 - name: permit traffic on port 8301/tcp
-  ansible.posix.firewalld:
+  firewalld:
     port: 80/tcp
     permanent: true
     state: enabled
@@ -145,28 +145,31 @@
     name: pymysql
     state: present
 
-# - name: Sets the root password
-#   mysql_user: 
-#     name: root 
-#     password: "{{ mysql_root_password }}" 
-#     state: present
-#     update_password: always
-#     login_user: root
-#     login_password :
-#   register: result
-#   ignore_errors: True
-#   changed_when: "'Access denied for user' not in result.stdout"
+- name: Create /root/.my.cnf
+  copy:
+    src: .my.cnf
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: '0644'  
 
-# - name: Remove all anonymous user accounts
-#   mysql_user:
-#     name: ''
-#     host_all: true
-#     state: absent
+- name: Sets MySQL root password
+  mysql_user: 
+    name: root 
+    password: "{{ mysql_root_password }}"  
+    state: present
 
-# - name: Remove MySQL test database
-#   mysql_db: 
-#     name: test
-#     state: absent
+- name: Remove all anonymous user accounts
+  mysql_user:
+    name: ''
+    host_all: true
+    state: absent
+
+- name: Remove MySQL test database
+  mysql_db: 
+    name: test
+    state: absent
+
 
 # 4. Let's add a default WordPress setup to our current setup
 

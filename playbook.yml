@@ -5,8 +5,9 @@
   vars:
   - hostname: b75914
   - domain_name: sa.cs.ut.ee
-  - ip_address: 172.17.89.26
+  - ip_address: 172.17.91.192
   - dns_zone: "{{hostname}}.sa.cs.ut.ee"
+  - mysql_root_password: pass
 
   pre_tasks:
   - name: Testing this out
@@ -23,7 +24,6 @@
   # - name: Create variable for IP address
   #   set_fact:
   #     ip_address: "{{ cloud_metadata.content }}"
-
 
   roles:
   # - { role: etais, tags: etais } 
