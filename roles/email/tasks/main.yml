@@ -1,0 +1,99 @@
+
+# 3. Email in general
+
+- name: Update MX to DNS configuration
+  lineinfile:
+    path: /etc/named/{{dns_zone}}
+    state: present
+    regexp: "{{hostname}}.sa.cs.ut.ee. IN MX 10 mail.{{hostname}}.sa.cs.ut.ee."
+    line: "{{hostname}}.sa.cs.ut.ee. IN MX 10 mail.{{hostname}}.sa.cs.ut.ee."
+    insertafter: IN\s+NS
+
+- name: Append A to DNS configuration
+  lineinfile:
+    path: /etc/named/{{dns_zone}}
+    state: present
+    regexp: "mail IN A {{ip_address}}"
+    line: "mail IN A {{ip_address}}"
+    insertafter : IN\s+A
+  
+- name: Update /etc/named/{{dns_zone}} serial
+  replace:
+    path: /etc/named/{{dns_zone}}
+    regexp: '\d{10}'
+    replace: "{{ lookup('pipe', 'date +%Y%m%d16') }}" # TODO better increment
+  notify:
+  - Restart DNS
+  - Restart Apache
+
+# 4. Postfix
+
+- name: Install Postfix
+  yum:
+    name: postfix
+    state: present
+
+# - name: Update /etc/postfix/main.cf
+#   replace:
+#     path: /etc/postfix/main.cf
+#     regexp: "{{ item.field }}" + '\s*=.*[^#\n]' # TODO 
+#     replace: "{{ item.field }} = {{ item.value }}"
+#   with_items: 
+#   - {field: inet_protocols, value: ipv4} # all
+#   - {field: myhostname, value: {{ hostname }}} # b75914.sa.cs.ut.ee
+#   - {field: inet_interfaces, value: all} # ipv4
+#   - {field: mynetworks_style, value: host} #${{$compatibility_level} < {2} ? {subnet} : {host}}
+#   - {field: relayhost, value: ""}  # ""
+#   - {field: mynetworks, value: ""} #127.0.0.1/32 192.168.42.110/32
+#   notify:
+#   - Restart Postfix
+
+
+- name: Update Postfix inet_protocols
+  replace:
+    path: /etc/postfix/main.cf
+    regexp: 'inet_protocols\s*=.*[^#\n]'
+    replace: inet_protocols = ipv4
+  notify:
+  - Restart Postfix
+
+- name: Update Postfix myhostname
+  replace:
+    path: /etc/postfix/main.cf
+    regexp: 'myhostname\s*=.*[^#\n]'
+    replace: "myhostname = {{ hostname }}"
+  notify:
+  - Restart Postfix
+
+- name: Update Postfix inet_interfaces
+  replace:
+    path: /etc/postfix/main.cf
+    regexp: 'inet_interfaces\s*=.*[^#\n]'
+    replace: inet_interfaces = all
+  notify:
+  - Restart Postfix
+
+- name: Update Postfix mynetworks_style
+  replace:
+    path: /etc/postfix/main.cf
+    regexp: 'mynetworks_style\s*=.*[^#\n]'
+    replace: mynetworks_style = host
+  notify:
+  - Restart Postfix
+
+- name: Update Postfix relayhost
+  replace:
+    path: /etc/postfix/main.cf
+    regexp: 'relayhost\s*=.*[^#\n]'
+    replace: relayhost =
+  notify:
+  - Restart Postfix
+
+
+- name: Update Postfix mynetworks
+  replace:
+    path: /etc/postfix/main.cf
+    regexp: 'mynetworks\s*=.*[^#\n]'
+    replace: mynetworks 
+  notify:
+  - Restart Postfix
