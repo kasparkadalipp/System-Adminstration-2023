@@ -33,6 +33,12 @@
     name: postfix
     state: present
 
+- name: Ensure Postfix service is running
+  systemd:
+    name: postfix
+    state: started
+    enabled: true
+
 # - name: Update /etc/postfix/main.cf
 #   replace:
 #     path: /etc/postfix/main.cf
@@ -96,4 +102,174 @@
     regexp: 'mynetworks\s*=.*[^#\n]'
     replace: mynetworks 
   notify:
+  - Restart Postfix
+
+- name: Install passlib
+  pip:
+    name: passlib
+
+- name: Add user mailuser
+  user:
+    name: mailuser
+    password: "{{ mailuser_password | password_hash('sha512') }}"
+
+# - name: Sending an e-mail # TODO
+#   community.general.mail:
+#     host: "{{ ip_address }}"
+#     port: 25
+#     username: "mailuser@{{ hostname }}.sa.cs.ut.ee"
+#     password: pass
+#     to: "Centos <centos@{{ hostname }}.sa.cs.ut.ee>"
+#     #to: Scoring <nagios@scoring.sa.cs.ut.ee>
+#     subject: Ansible-email
+#     body: System {{ hostname }} sent mail.
+
+
+# 5. Dovecot
+
+- name: Install Dovecot
+  yum:
+    name: dovecot
+    state: present
+
+- name: Ensure Dovecot service is running
+  systemd:
+    name: dovecot
+    state: started
+    enabled: true
+
+- name: Update Dovecot mail_debug 
+  replace:
+    path: /etc/dovecot/conf.d/10-logging.conf
+    regexp: 'mail_debug\s*=.*[^#\n]'
+    replace: mail_debug = yes # mail_debug = no
+  notify:
+  - Restart Dovecot
+
+- name: Update Dovecot mail_debug 
+  replace:
+    path: /etc/dovecot/conf.d/10-logging.conf
+    regexp: 'auth_mechanisms\s*=.*[^#\n]'
+    replace: auth_mechanisms = plain login # auth_mechanisms = plain
+  notify:
+  - Restart Dovecot
+
+- name: Update Dovecot mail_debug 
+  replace:
+    path: /etc/dovecot/conf.d/10-logging.conf
+    regexp: '#?auth_username_format\s*=.*[^#\n]'
+    replace: auth_username_format = %n #auth_username_format = %Lu
+  notify:
+  - Restart Dovecot
+
+- name: Update main conf Dovecot protocols 
+  replace:
+    path: /etc/dovecot/dovecot.conf
+    regexp: '#?protocols\s*=.*[^#\n]' 
+    replace: protocols = imap # #protocols = imap pop3 lmtp submission
+  notify:
+  - Restart Dovecot
+
+- name: Update main conf Dovecot mail_privileged_group 
+  replace:
+    path: /etc/dovecot/dovecot.conf
+    regexp: '#?mail_privileged_group\s*=.*[^#\n]' 
+    replace: mail_privileged_group = all # mail_privileged_group =
+  notify:
+  - Restart Dovecot
+
+- name: Add dovecot to mail group
+  user:
+    name: dovecot
+    groups: mail
+    append: true
+    state: present
+
+- name: Enable automatic folder creation
+  lineinfile:
+    path: /etc/dovecot/conf.d/15-mailboxes.conf
+    state: present
+    regexp: auto = create
+    line: auto = create
+    insertafter: mailbox Trash
+
+- name: Create spam mailbox
+  blockinfile:
+    path: /etc/dovecot/conf.d/15-mailboxes.conf
+    state: present
+    insertafter: namespace inbox
+    block: |
+      mailbox "Spam" {
+        special_use = \Junk
+      }
+
+# 5.2 Testing IMAP login
+
+- name: Permit traffic on port
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: enabled
+  with_items:
+  - 25
+  - 143
+  - 465
+  - 993
+  notify:
+  - Restart firewall
+
+
+- name: Install telnet
+  yum:
+    name: telnet
+    state: present
+
+
+- name: Update Dovecot disable_plaintext_auth 
+  replace:
+    path: /etc/dovecot/conf.d/10-auth.conf
+    regexp: '#?disable_plaintext_auth\s*=.*[^#\n]' 
+    replace: disable_plaintext_auth = yes #disable_plaintext_auth = yes
+  notify:
+  - Restart Dovecot
+    
+- name: Update Dovecot disable_plaintext_auth 
+  replace:
+    path: /etc/dovecot/conf.d/10-ssl.conf
+    regexp: '#?ssl\s*=.*[^#\n]' 
+    replace: ssl = no # ssl = required
+  notify:
+  - Restart Dovecot
+    
+- name: Add lmtp protocol to Dovecot main conf
+  replace:
+    path: /etc/dovecot/dovecot.conf
+    regexp: '#?disable_plaintext_auth\s*=.*[^#\n]' 
+    replace: disable_plaintext_auth = yes #disable_plaintext_auth = yes
+  notify:
+  - Restart Dovecot
+
+# 5.3 Give mailbox handling from postfix to dovecot
+
+
+- name: Define lmtp listener
+  blockinfile:
+    path: /etc/dovecot/conf.d/10-master.conf
+    state: present
+    block: |
+      service lmtp {
+      unix_listener /var/spool/postfix/private/dovecot-lmtp { # unix_listener $PATH_TO_SOCKET
+        mode = 0600                                           # Socket permissions
+        user = postfix                                        # Socket owner
+        group = postfix                                       # Socket group
+        }
+      }
+
+- name: Update Dovecot mailbox_transport  
+  replace:
+    path: /etc/dovecot/conf.d/10-ssl.conf
+    regexp: '#?mailbox_transport \s*=.*[^#\n]' 
+    replace: mailbox_transport  = lmtp:unix:private/dovecot-lmtp # mailbox_transport = lmtp:unix:/var/lib/imap/socket/lmtp
+  notify:
+  - Restart Dovecot
   - Restart Postfix
