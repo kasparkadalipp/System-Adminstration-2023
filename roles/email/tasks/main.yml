@@ -273,3 +273,113 @@
   notify:
   - Restart Dovecot
   - Restart Postfix
+
+
+
+
+
+
+
+# Set postfix to also listen on submission port 587 In postfix's master.cf configure submission section as follow
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 6 Setting up a web service for mailbox access
+
+
+- name: Install dnf package
+  dnf:
+    autoremove: yes
+  with_items:
+  - epel-release
+  - dnf-plugins-core
+
+# dnf config-manager --set-enabled crb # TODO
+# - name: Enable CRB repository
+#   dnf:
+#     name: crb
+#     enablerepo: crb
+
+- name: Install yum package
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ImageMagick
+    - ImageMagick-devel
+    - ImageMagick-perl
+    - pcre-devel
+    - zlib
+    - zlib-devel
+    - libzip
+    #- libzip-devel # libzip-devel failed
+    - libmcrypt-devel
+    - php
+    - php-fpm
+    - php-devel
+    - php-pear
+    - php-cli
+    - php-gd
+    - php-curl
+    - php-xml
+    - php-mysqlnd
+    - php-mbstring
+    - php-intl
+    - php-ldap
+    - mariadb
+    - mariadb-server
+    - httpd
+  
+- name: Install pecl package
+  community.general.pear:
+    name: pecl/json_post
+    state: present
+  with_items:
+  - imagick
+  - mcrypt 
+  - zip 
+
+- name: Create extensions file
+  file:
+    path: /etc/php.d/
+    dest: "20-{{ item }}.ini"
+    owner: root
+    group: root
+    mode: '0755'
+    access_time: preserve
+    modification_time: preserve 
+    state: touch
+    content: "extension={{ item }}"
+  with_items:
+  - imagick
+  - mcrypt 
+  - zip 

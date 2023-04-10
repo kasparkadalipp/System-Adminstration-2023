@@ -92,6 +92,7 @@
 - name: Create necessary files for logging
   file:
     path: /var/named/log/
+    dest: "{{item}}"
     owner: named
     group: named
     mode: '0755'
