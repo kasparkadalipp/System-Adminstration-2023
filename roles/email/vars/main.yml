@@ -1,1 +1,3 @@
 mailuser_password: pass
+
+newline_regex: '\s*=.*[^#\n]'

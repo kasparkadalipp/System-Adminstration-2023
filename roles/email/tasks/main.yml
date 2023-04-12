@@ -39,68 +39,18 @@
     state: started
     enabled: true
 
-# - name: Update /etc/postfix/main.cf
-#   replace:
-#     path: /etc/postfix/main.cf
-#     regexp: "{{ item.field }}" + '\s*=.*[^#\n]' # TODO 
-#     replace: "{{ item.field }} = {{ item.value }}"
-#   with_items: 
-#   - {field: inet_protocols, value: ipv4} # all
-#   - {field: myhostname, value: {{ hostname }}} # b75914.sa.cs.ut.ee
-#   - {field: inet_interfaces, value: all} # ipv4
-#   - {field: mynetworks_style, value: host} #${{$compatibility_level} < {2} ? {subnet} : {host}}
-#   - {field: relayhost, value: ""}  # ""
-#   - {field: mynetworks, value: ""} #127.0.0.1/32 192.168.42.110/32
-#   notify:
-#   - Restart Postfix
-
-
-- name: Update Postfix inet_protocols
+- name: Update /etc/postfix/main.cf
   replace:
     path: /etc/postfix/main.cf
-    regexp: 'inet_protocols\s*=.*[^#\n]'
-    replace: inet_protocols = ipv4
-  notify:
-  - Restart Postfix
-
-- name: Update Postfix myhostname
-  replace:
-    path: /etc/postfix/main.cf
-    regexp: 'myhostname\s*=.*[^#\n]'
-    replace: "myhostname = {{ hostname }}"
-  notify:
-  - Restart Postfix
-
-- name: Update Postfix inet_interfaces
-  replace:
-    path: /etc/postfix/main.cf
-    regexp: 'inet_interfaces\s*=.*[^#\n]'
-    replace: inet_interfaces = all
-  notify:
-  - Restart Postfix
-
-- name: Update Postfix mynetworks_style
-  replace:
-    path: /etc/postfix/main.cf
-    regexp: 'mynetworks_style\s*=.*[^#\n]'
-    replace: mynetworks_style = host
-  notify:
-  - Restart Postfix
-
-- name: Update Postfix relayhost
-  replace:
-    path: /etc/postfix/main.cf
-    regexp: 'relayhost\s*=.*[^#\n]'
-    replace: relayhost =
-  notify:
-  - Restart Postfix
-
-
-- name: Update Postfix mynetworks
-  replace:
-    path: /etc/postfix/main.cf
-    regexp: 'mynetworks\s*=.*[^#\n]'
-    replace: mynetworks 
+    regexp: "{{ item.field }} {{newline_regex}}" # TODO 
+    replace: "{{ item.field }} = {{ item.value }}"
+  with_items: 
+  - {field: inet_protocols, value: ipv4} # all
+  - {field: myhostname, value: "{{ hostname }}"} # b75914.sa.cs.ut.ee
+  - {field: inet_interfaces, value: all} # ipv4
+  - {field: mynetworks_style, value: host} #${{$compatibility_level} < {2} ? {subnet} : {host}}
+  - {field: relayhost, value: ""}  # ""
+  - {field: mynetworks, value: ""} #127.0.0.1/32 192.168.42.110/32
   notify:
   - Restart Postfix
 
@@ -166,7 +116,7 @@
   replace:
     path: /etc/dovecot/dovecot.conf
     regexp: '#?protocols\s*=.*[^#\n]' 
-    replace: protocols = imap # #protocols = imap pop3 lmtp submission
+    replace: protocols = imap lmtp # #protocols = imap pop3 lmtp submission
   notify:
   - Restart Dovecot
 
@@ -274,32 +224,41 @@
   - Restart Dovecot
   - Restart Postfix
 
+# - name: Set postfix to also listen on submission port 
+#   blockinfile:
+#     path: /etc/postfix/master.cf
+#     state: present
+#     block: |
+#       submission inet n       -       n       -       -       smtpd
+#         -o syslog_name=postfix/submission
+#         -o smtpd_sasl_auth_enable=yes
+#         -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+#         -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+#         -o smtpd_sasl_type=dovecot
+#         -o smtpd_sasl_path=private/auth
+
+#       # Explanations:
+#       #  -o syslog_name=postfix/submission: The name with which submission related events are logged
+#       #  -o smtpd_sasl_auth_enable=yes:     Enable sasl authentication (`plain` in our case)
+#       #  -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject: Permit recepients outside of $mynetworks only to authenticated users
+#       #  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject: Allow mail relaying only for authenticated users
+#       #  -o smtpd_sasl_type=dovecot:      Set dovecot as the SASL provider
+#       #  -o smtpd_sasl_path=private/auth: Set authentication socket location
 
 
 
-
-
-
-# Set postfix to also listen on submission port 587 In postfix's master.cf configure submission section as follow
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- name: Define auth service
+  blockinfile:
+    path: /etc/dovecot/conf.d/10-master.conf
+    state: present
+    block: |
+      service auth {
+        unix_listener /var/spool/postfix/private/auth {
+          mode = 0600
+          user = postfix
+          group = postfix
+        }
+      }
 
 
 
