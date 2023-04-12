@@ -2,12 +2,17 @@
 ; BIND data file for local zone {{dns_zone}};
 $TTL    15M
 @       IN      SOA     ns1.{{dns_zone}}. root.{{dns_zone}}. (
-                     2023030800         ; Serial
+                     {{dns_serial}}         ; Serial
                             15M         ; Refresh
                              5M         ; Retry
                            120M         ; Expire
                             600 )       ; Negative Cache TTL
 @              IN      NS      ns1
+{{dns_zone}}. IN MX 10 mail.{{dns_zone}}.
 @              IN      A       {{ip_address}}
 ns1            IN      A       {{ip_address}}
 {{hostname}}   IN      A       {{ip_address}}
+mail IN A {{ip_address}}
+www IN CNAME {{dns_zone}}.
+proxy IN CNAME {{dns_zone}}.
+wordpress IN CNAME {{dns_zone}}.
