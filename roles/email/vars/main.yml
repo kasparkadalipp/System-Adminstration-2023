@@ -1,3 +1,6 @@
+mailuser_password: pass
+
+# main.cf
 postfix_conf_inet_protocols: ipv4 # all
 postfix_conf_myhostname: "{{ hostname }}" # b75914.sa.cs.ut.ee
 postfix_conf_inet_interfaces: all # localhost
@@ -5,7 +8,28 @@ postfix_conf_mynetworks_style: host # ""
 postfix_conf_relayhost: "" # # ""
 postfix_conf_mynetworks: "" #127.0.0.1/32 192.168.42.110/32
 
+# 10-logging.conf
+dovecot_mail_debug: yes # no
 
-mailuser_password: pass
+# 10-auth.conf
+dovecot_auth_mechanisms: "plain login" # plain
+dovecot_auth_username_format: "%n" # %Lu
 
-newline_regex: '\s*=.*[^#\n]'
+# 10-mail.conf
+dovecot_mail_location: "maildir:~/mail"
+dovecot_mail_privileged_group: mail
+
+# dovecot.conf
+dovecot_protocols: "imap lmtp" # imap pop3 lmtp submission
+
+# 15-mailboxes.conf
+dovecot_mailbox_trash: |
+  mailbox Trash {
+      auto = create
+      special_use = \Trash
+    }
+dovecot_mailbox_spam: |
+  mailbox Spam {
+      auto = create
+      special_use = \Junk
+    }

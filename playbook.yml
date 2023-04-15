@@ -24,5 +24,5 @@
   # - { role: dns, tags: dns }
   # - { role: apache, tags: apache}
   # mysql_secure_installation
-  - { role: wordpress, tags: apache}
-  # - { role: email, tags: email}
+  # - { role: wordpress, tags: apache}
+  - { role: email, tags: email}
