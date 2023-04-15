@@ -10,8 +10,8 @@
     state: present
  
 - name: Create /root/.my.cnf
-  copy:
-    src: .my.cnf
+  template:
+    src: .my.cnf.j2
     dest: /root/.my.cnf
     owner: root
     group: root
