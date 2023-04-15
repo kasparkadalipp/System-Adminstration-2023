@@ -34,6 +34,18 @@
     name: test
     state: absent
 
+- name: Create database
+  mysql_db:
+    name: "{{ db_name }}"
+    state: present
+
+- name: Create user admin
+  mysql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    priv: '{{ db_name }}.*:ALL,GRANT'
+    state: present
+
 # 4. Let's add a default WordPress setup to our current setup
 
 - name: Extract wordpress.tar.gz
@@ -42,6 +54,14 @@
     dest: /var/www/html
     remote_src: yes
     creates: /var/www/html/wordpress
+
+- name: Update wordpress config
+  template:
+    src: wp-config.php.j2
+    dest: /var/www/html/wordpress/wp-config.php
+    owner: apache
+    group: apache
+    mode: '0666'
 
 - name: Set ownership of wordpress directory to apache:apache
   file:
@@ -57,24 +77,30 @@
     setype: httpd_sys_rw_content_t
     state: present
 
-- name: Create WordPress log file 
+- name: Create WordPress log file
   file:
-    path: /var/log/httpd/php-errors.log
+    path: "{{ item }}"
     owner: apache
     group: apache
     mode: '0644'
     access_time: preserve
     modification_time: preserve 
     state: touch
-
-- name: Combine WordPress PHP logs
-  replace:
-    path: "{{item.file}}"
-    regexp: "{{item.error_log}}"
-    replace: /var/log/httpd/php-errors.log
   with_items:
-  - {file: /etc/php-fpm.d/www.conf, error_log: /var/log/php-fpm/www-error.log}
-  - {file: /etc/php-fpm.conf, error_log: /var/log/php-fpm/error.log}
+  - "{{ php_gpm_conf_log }}"
+  - "{{ www_php_gpm_conf_log }}"
+
+# TODO uncomment, copy initial values and change to error log path
+- name: Change WordPress PHP log locations
+  copy:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+    owner: apache
+    group: apache
+    mode: '0666'
+  with_items:
+  - {dest: /etc/php-fpm.d/www.conf, src: www-error.log} # error_log = /var/log/httpd/www-php-errors.log
+  - {dest: /etc/php-fpm.conf, src: error.log} # error_log = /var/log/httpd/php-errors.log
 
 - name: Ensure MariaDB service is running
   ansible.builtin.service:
@@ -112,3 +138,9 @@
   with_items:
   - www.{{hostname}}
   - proxy
+
+- name: Ensure apache is running
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: true

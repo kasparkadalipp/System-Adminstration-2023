@@ -14,12 +14,6 @@
   notify:
   - Restart firewall
 
-- name: Ensure apache is running
-  ansible.builtin.service:
-    name: httpd
-    state: started
-    enabled: true
-
 - name: Create directory /var/www/html/www.{{hostname}}/public_html
   file:
     path: /var/www/html/www.{{hostname}}/public_html
@@ -43,8 +37,6 @@
     owner: root
     group: root
     mode: '0644'
-  notify:
-  - Restart Apache
 
 # 3.3 Utilizing a web server as a proxy
 - name: Add user proxy
