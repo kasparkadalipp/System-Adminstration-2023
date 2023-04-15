@@ -147,16 +147,9 @@
   systemd:
     name: firewalld
     state: restarted
-    
-- name: Stop named service
-  systemd:
-    name: named
-    state: stopped
-  changed_when: false
 
 - name: Start named service
   systemd:
     name: named
     state: started
     enabled: true
-  changed_when: false
