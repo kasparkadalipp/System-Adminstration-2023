@@ -100,7 +100,7 @@ myhostname = {{ postfix_conf_myhostname }}
 # $mydomain is used as a default value for many other configuration
 # parameters.
 #
-#mydomain = domain.tld
+mydomain = {{ postfix_mydomain }}
 
 # SENDING MAIL
 # 
@@ -116,7 +116,7 @@ myhostname = {{ postfix_conf_myhostname }}
 # to recipient addresses that have no @domain part.
 #
 #myorigin = $myhostname
-#myorigin = $mydomain
+myorigin = {{ postfix_myorigin }}
 
 # RECEIVING MAIL
 
@@ -181,10 +181,11 @@ inet_protocols = {{ postfix_conf_inet_protocols }}
 #
 # See also below, section "REJECTING MAIL FOR UNKNOWN LOCAL USERS".
 #
-mydestination = $myhostname, localhost.$mydomain, localhost
+#mydestination = $myhostname, localhost.$mydomain, localhost
 #mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
 #mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain,
 #	mail.$mydomain, www.$mydomain, ftp.$mydomain
+mydestination = {{ postfix_mydestination }}
 
 # REJECTING MAIL FOR UNKNOWN LOCAL USERS
 #

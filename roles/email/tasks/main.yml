@@ -15,6 +15,8 @@
     owner: root
     group: root
     mode: '0644'
+  notify:
+  - Restart Postfix
 
 - name: Ensure Postfix service is running
   systemd:
