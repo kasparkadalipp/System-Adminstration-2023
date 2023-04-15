@@ -1,25 +1,5 @@
-# 3.1 Understanding DNS CNAME records
-# REPLACED WITH TEMPLATE
-# - name: Append cname to /etc/named/{{dns_zone}}
-#   ansible.builtin.lineinfile:
-#     path: /etc/named/{{dns_zone}}
-#     state: present
-#     regexp: "{{item}} IN CNAME {{dns_zone}}."
-#     line: "{{item}} IN CNAME {{dns_zone}}."
-#   register: cname
-#   with_items:
-#   - www
-#   - proxy
-#   - wordpress
+# 3.1 Understanding DNS CNAME records (added to template)
 
-# - name: Update /etc/named/b75914.sa.cs.ut.ee serial
-#   replace:
-#     path: /etc/named/{{dns_zone}}
-#     regexp: '\d{10}'
-#     replace: "{{ lookup('pipe', 'date +%Y%m%d10') }}" # TODO better increment
-#   when: cname.changed
-#   notify:
-#   - Restart DNS
 #   - Restart Apache
 
 # 3.2 Virtual Web Hosts Using Apache Web Server
