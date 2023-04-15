@@ -6,7 +6,7 @@
   - hostname: b75914
   - domain_name: sa.cs.ut.ee
   - ip_address: 172.17.91.192
-  - dns_zone: "{{hostname}}.sa.cs.ut.ee"
+  - dns_zone: "{{hostname}}.{{domain_name}}"
   - dns_serial_counter: 1
 
   # don't change
@@ -16,7 +16,8 @@
   
   pre_tasks:
   - name: Testing this out
-    debug: msg="Hello"
+    debug:
+     msg: Hello
 
   # - name: Get OpenStack metadata
   #   uri:
@@ -34,4 +35,5 @@
   # - { role: etais, tags: etais } 
   # - { role: dns, tags: dns }
   - { role: apache, tags: apache}
+  - { role: wordpress, tags: apache}
   # - { role: email, tags: email}

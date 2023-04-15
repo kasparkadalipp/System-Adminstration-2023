@@ -1,0 +1,114 @@
+# mysql_secure_installation # TODO
+
+- name: Testing this out
+  debug: 
+    msg: "Run mysql_secure_installation if this fails"
+
+- name: Make sure pymysql is present
+  pip:
+    name: pymysql
+    state: present
+ 
+- name: Create /root/.my.cnf
+  copy:
+    src: .my.cnf
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: '0644'  
+
+- name: Sets MySQL root password
+  mysql_user: 
+    name: root 
+    password: "{{ mysql_root_password }}"  
+    state: present
+
+- name: Remove all anonymous user accounts
+  mysql_user:
+    name: ''
+    host_all: true
+    state: absent
+
+- name: Remove MySQL test database
+  mysql_db: 
+    name: test
+    state: absent
+
+# 4. Let's add a default WordPress setup to our current setup
+
+- name: Extract wordpress.tar.gz
+  unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: /var/www/html
+    remote_src: yes
+    creates: /var/www/html/wordpress
+
+- name: Set ownership of wordpress directory to apache:apache
+  file:
+    path: /var/www/html/wordpress
+    state: directory
+    owner: apache
+    group: apache
+    recurse: yes
+
+- name: Sefcontext | this equates to 'chcon -t httpd_sys_rw_content_t /var/www/html/wordpress -R'
+  sefcontext:
+    target: '/var/www/html/wordpress(/.*)?'
+    setype: httpd_sys_rw_content_t
+    state: present
+
+- name: Create WordPress log file 
+  file:
+    path: /var/log/httpd/php-errors.log
+    owner: apache
+    group: apache
+    mode: '0644'
+    access_time: preserve
+    modification_time: preserve 
+    state: touch
+
+- name: Combine WordPress PHP logs
+  replace:
+    path: "{{item.file}}"
+    regexp: "{{item.error_log}}"
+    replace: /var/log/httpd/php-errors.log
+  with_items:
+  - {file: /etc/php-fpm.d/www.conf, error_log: /var/log/php-fpm/www-error.log}
+  - {file: /etc/php-fpm.conf, error_log: /var/log/php-fpm/error.log}
+
+- name: Ensure MariaDB service is running
+  ansible.builtin.service:
+    name: php-fpm
+    state: started
+    enabled: true
+
+- name: Create /etc/httpd/conf.d/wordpress.conf
+  template:
+    src: wordpress.conf.j2
+    dest: /etc/httpd/conf.d/wordpress.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+# 5. Configuring Apache modules
+- name: Enable forensic logging
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    state: present
+    regexp: "{{item}}"
+    line: "{{item}}"
+  with_items:
+  - "LoadModule log_forensic_module modules/mod_log_forensic.so"
+
+- name: Create forensic log file 
+  file:
+    path: "/var/log/httpd/{{item}}-forensic.log"
+    owner: apache
+    group: apache
+    mode: '0644'
+    access_time: preserve
+    modification_time: preserve 
+    state: touch
+  with_items:
+  - www.{{hostname}}
+  - proxy
