@@ -1,31 +1,6 @@
 
 # 3. Email in general
 
-- name: Update MX to DNS configuration
-  lineinfile:
-    path: /etc/named/{{dns_zone}}
-    state: present
-    regexp: "{{hostname}}.sa.cs.ut.ee. IN MX 10 mail.{{hostname}}.sa.cs.ut.ee."
-    line: "{{hostname}}.sa.cs.ut.ee. IN MX 10 mail.{{hostname}}.sa.cs.ut.ee."
-    insertafter: IN\s+NS
-
-- name: Append A to DNS configuration
-  lineinfile:
-    path: /etc/named/{{dns_zone}}
-    state: present
-    regexp: "mail IN A {{ip_address}}"
-    line: "mail IN A {{ip_address}}"
-    insertafter : IN\s+A
-  
-- name: Update /etc/named/{{dns_zone}} serial
-  replace:
-    path: /etc/named/{{dns_zone}}
-    regexp: '\d{10}'
-    replace: "{{ lookup('pipe', 'date +%Y%m%d16') }}" # TODO better increment
-  notify:
-  - Restart DNS
-  - Restart Apache
-
 # 4. Postfix
 
 - name: Install Postfix
