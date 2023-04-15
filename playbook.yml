@@ -19,21 +19,10 @@
     debug:
      msg: Hello
 
-  # - name: Get OpenStack metadata
-  #   uri:
-  #     url: http://169.254.169.254/latest/meta-data/public-ipv4 
-  #     method: GET
-  #     status_code: 200
-  #     return_content: yes
-  #   register: cloud_metadata
-
-  # - name: Create variable for IP address
-  #   set_fact:
-  #     ip_address: "{{ cloud_metadata.content }}"
-
   roles:
   # - { role: etais, tags: etais } 
   # - { role: dns, tags: dns }
   - { role: apache, tags: apache}
+  # run mysql_secure_installation
   - { role: wordpress, tags: apache}
   # - { role: email, tags: email}
