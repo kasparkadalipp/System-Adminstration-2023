@@ -8,312 +8,305 @@
     name: postfix
     state: present
 
+- name: Update Postfix main conf
+  template:
+    src: main.cf.j2
+    dest: /etc/postfix/main.cf
+    owner: root
+    group: root
+    mode: '0644'
+
 - name: Ensure Postfix service is running
   systemd:
     name: postfix
     state: started
     enabled: true
 
-- name: Update /etc/postfix/main.cf
-  replace:
-    path: /etc/postfix/main.cf
-    regexp: "{{ item.field }} {{newline_regex}}" # TODO 
-    replace: "{{ item.field }} = {{ item.value }}"
-  with_items: 
-  - {field: inet_protocols, value: ipv4} # all
-  - {field: myhostname, value: "{{ hostname }}"} # b75914.sa.cs.ut.ee
-  - {field: inet_interfaces, value: all} # ipv4
-  - {field: mynetworks_style, value: host} #${{$compatibility_level} < {2} ? {subnet} : {host}}
-  - {field: relayhost, value: ""}  # ""
-  - {field: mynetworks, value: ""} #127.0.0.1/32 192.168.42.110/32
-  notify:
-  - Restart Postfix
+# - name: Install passlib
+#   pip:
+#     name: passlib
 
-- name: Install passlib
-  pip:
-    name: passlib
+# - name: Add user mailuser
+#   user:
+#     name: mailuser
+#     password: "{{ mailuser_password | password_hash('sha512') }}"
 
-- name: Add user mailuser
-  user:
-    name: mailuser
-    password: "{{ mailuser_password | password_hash('sha512') }}"
-
-# - name: Sending an e-mail # TODO
-#   community.general.mail:
-#     host: "{{ ip_address }}"
-#     port: 25
-#     username: "mailuser@{{ hostname }}.sa.cs.ut.ee"
-#     password: pass
-#     to: "Centos <centos@{{ hostname }}.sa.cs.ut.ee>"
-#     #to: Scoring <nagios@scoring.sa.cs.ut.ee>
-#     subject: Ansible-email
-#     body: System {{ hostname }} sent mail.
+# # - name: Sending an e-mail # TODO
+# #   community.general.mail:
+# #     host: "{{ ip_address }}"
+# #     port: 25
+# #     username: "mailuser@{{ hostname }}.sa.cs.ut.ee"
+# #     password: pass
+# #     to: "Centos <centos@{{ hostname }}.sa.cs.ut.ee>"
+# #     #to: Scoring <nagios@scoring.sa.cs.ut.ee>
+# #     subject: Ansible-email
+# #     body: System {{ hostname }} sent mail.
 
 
-# 5. Dovecot
+# # 5. Dovecot
 
-- name: Install Dovecot
-  yum:
-    name: dovecot
-    state: present
+# - name: Install Dovecot
+#   yum:
+#     name: dovecot
+#     state: present
 
-- name: Ensure Dovecot service is running
-  systemd:
-    name: dovecot
-    state: started
-    enabled: true
+# - name: Ensure Dovecot service is running
+#   systemd:
+#     name: dovecot
+#     state: started
+#     enabled: true
 
-- name: Update Dovecot mail_debug 
-  replace:
-    path: /etc/dovecot/conf.d/10-logging.conf
-    regexp: 'mail_debug\s*=.*[^#\n]'
-    replace: mail_debug = yes # mail_debug = no
-  notify:
-  - Restart Dovecot
+# - name: Update Dovecot mail_debug 
+#   replace:
+#     path: /etc/dovecot/conf.d/10-logging.conf
+#     regexp: 'mail_debug\s*=.*[^#\n]'
+#     replace: mail_debug = yes # mail_debug = no
+#   notify:
+#   - Restart Dovecot
 
-- name: Update Dovecot mail_debug 
-  replace:
-    path: /etc/dovecot/conf.d/10-logging.conf
-    regexp: 'auth_mechanisms\s*=.*[^#\n]'
-    replace: auth_mechanisms = plain login # auth_mechanisms = plain
-  notify:
-  - Restart Dovecot
+# - name: Update Dovecot mail_debug 
+#   replace:
+#     path: /etc/dovecot/conf.d/10-logging.conf
+#     regexp: 'auth_mechanisms\s*=.*[^#\n]'
+#     replace: auth_mechanisms = plain login # auth_mechanisms = plain
+#   notify:
+#   - Restart Dovecot
 
-- name: Update Dovecot mail_debug 
-  replace:
-    path: /etc/dovecot/conf.d/10-logging.conf
-    regexp: '#?auth_username_format\s*=.*[^#\n]'
-    replace: auth_username_format = %n #auth_username_format = %Lu
-  notify:
-  - Restart Dovecot
+# - name: Update Dovecot mail_debug 
+#   replace:
+#     path: /etc/dovecot/conf.d/10-logging.conf
+#     regexp: '#?auth_username_format\s*=.*[^#\n]'
+#     replace: auth_username_format = %n #auth_username_format = %Lu
+#   notify:
+#   - Restart Dovecot
 
-- name: Update main conf Dovecot protocols 
-  replace:
-    path: /etc/dovecot/dovecot.conf
-    regexp: '#?protocols\s*=.*[^#\n]' 
-    replace: protocols = imap lmtp # #protocols = imap pop3 lmtp submission
-  notify:
-  - Restart Dovecot
+# - name: Update main conf Dovecot protocols 
+#   replace:
+#     path: /etc/dovecot/dovecot.conf
+#     regexp: '#?protocols\s*=.*[^#\n]' 
+#     replace: protocols = imap lmtp # #protocols = imap pop3 lmtp submission
+#   notify:
+#   - Restart Dovecot
 
-- name: Update main conf Dovecot mail_privileged_group 
-  replace:
-    path: /etc/dovecot/dovecot.conf
-    regexp: '#?mail_privileged_group\s*=.*[^#\n]' 
-    replace: mail_privileged_group = all # mail_privileged_group =
-  notify:
-  - Restart Dovecot
+# - name: Update main conf Dovecot mail_privileged_group 
+#   replace:
+#     path: /etc/dovecot/dovecot.conf
+#     regexp: '#?mail_privileged_group\s*=.*[^#\n]' 
+#     replace: mail_privileged_group = all # mail_privileged_group =
+#   notify:
+#   - Restart Dovecot
 
-- name: Add dovecot to mail group
-  user:
-    name: dovecot
-    groups: mail
-    append: true
-    state: present
+# - name: Add dovecot to mail group
+#   user:
+#     name: dovecot
+#     groups: mail
+#     append: true
+#     state: present
 
-- name: Enable automatic folder creation
-  lineinfile:
-    path: /etc/dovecot/conf.d/15-mailboxes.conf
-    state: present
-    regexp: auto = create
-    line: auto = create
-    insertafter: mailbox Trash
+# - name: Enable automatic folder creation
+#   lineinfile:
+#     path: /etc/dovecot/conf.d/15-mailboxes.conf
+#     state: present
+#     regexp: auto = create
+#     line: auto = create
+#     insertafter: mailbox Trash
 
-- name: Create spam mailbox
-  blockinfile:
-    path: /etc/dovecot/conf.d/15-mailboxes.conf
-    state: present
-    insertafter: namespace inbox
-    block: |
-      mailbox "Spam" {
-        special_use = \Junk
-      }
-
-# 5.2 Testing IMAP login
-
-- name: Permit traffic on port
-  firewalld:
-    port: "{{ item }}/tcp"
-    permanent: true
-    state: enabled
-  with_items:
-  - 25
-  - 143
-  - 465
-  - 993
-  notify:
-  - Restart firewall
-
-
-- name: Install telnet
-  yum:
-    name: telnet
-    state: present
-
-
-- name: Update Dovecot disable_plaintext_auth 
-  replace:
-    path: /etc/dovecot/conf.d/10-auth.conf
-    regexp: '#?disable_plaintext_auth\s*=.*[^#\n]' 
-    replace: disable_plaintext_auth = yes #disable_plaintext_auth = yes
-  notify:
-  - Restart Dovecot
-    
-- name: Update Dovecot disable_plaintext_auth 
-  replace:
-    path: /etc/dovecot/conf.d/10-ssl.conf
-    regexp: '#?ssl\s*=.*[^#\n]' 
-    replace: ssl = no # ssl = required
-  notify:
-  - Restart Dovecot
-    
-- name: Add lmtp protocol to Dovecot main conf
-  replace:
-    path: /etc/dovecot/dovecot.conf
-    regexp: '#?disable_plaintext_auth\s*=.*[^#\n]' 
-    replace: disable_plaintext_auth = yes #disable_plaintext_auth = yes
-  notify:
-  - Restart Dovecot
-
-# 5.3 Give mailbox handling from postfix to dovecot
-
-
-- name: Define lmtp listener
-  blockinfile:
-    path: /etc/dovecot/conf.d/10-master.conf
-    state: present
-    block: |
-      service lmtp {
-      unix_listener /var/spool/postfix/private/dovecot-lmtp { # unix_listener $PATH_TO_SOCKET
-        mode = 0600                                           # Socket permissions
-        user = postfix                                        # Socket owner
-        group = postfix                                       # Socket group
-        }
-      }
-
-- name: Update Dovecot mailbox_transport  
-  replace:
-    path: /etc/dovecot/conf.d/10-ssl.conf
-    regexp: '#?mailbox_transport \s*=.*[^#\n]' 
-    replace: mailbox_transport  = lmtp:unix:private/dovecot-lmtp # mailbox_transport = lmtp:unix:/var/lib/imap/socket/lmtp
-  notify:
-  - Restart Dovecot
-  - Restart Postfix
-
-# - name: Set postfix to also listen on submission port 
+# - name: Create spam mailbox
 #   blockinfile:
-#     path: /etc/postfix/master.cf
+#     path: /etc/dovecot/conf.d/15-mailboxes.conf
+#     state: present
+#     insertafter: namespace inbox
+#     block: |
+#       mailbox "Spam" {
+#         special_use = \Junk
+#       }
+
+# # 5.2 Testing IMAP login
+
+# - name: Permit traffic on port
+#   firewalld:
+#     port: "{{ item }}/tcp"
+#     permanent: true
+#     state: enabled
+#   with_items:
+#   - 25
+#   - 143
+#   - 465
+#   - 993
+#   notify:
+#   - Restart firewall
+
+
+# - name: Install telnet
+#   yum:
+#     name: telnet
+#     state: present
+
+
+# - name: Update Dovecot disable_plaintext_auth 
+#   replace:
+#     path: /etc/dovecot/conf.d/10-auth.conf
+#     regexp: '#?disable_plaintext_auth\s*=.*[^#\n]' 
+#     replace: disable_plaintext_auth = yes #disable_plaintext_auth = yes
+#   notify:
+#   - Restart Dovecot
+    
+# - name: Update Dovecot disable_plaintext_auth 
+#   replace:
+#     path: /etc/dovecot/conf.d/10-ssl.conf
+#     regexp: '#?ssl\s*=.*[^#\n]' 
+#     replace: ssl = no # ssl = required
+#   notify:
+#   - Restart Dovecot
+    
+# - name: Add lmtp protocol to Dovecot main conf
+#   replace:
+#     path: /etc/dovecot/dovecot.conf
+#     regexp: '#?disable_plaintext_auth\s*=.*[^#\n]' 
+#     replace: disable_plaintext_auth = yes #disable_plaintext_auth = yes
+#   notify:
+#   - Restart Dovecot
+
+# # 5.3 Give mailbox handling from postfix to dovecot
+
+
+# - name: Define lmtp listener
+#   blockinfile:
+#     path: /etc/dovecot/conf.d/10-master.conf
 #     state: present
 #     block: |
-#       submission inet n       -       n       -       -       smtpd
-#         -o syslog_name=postfix/submission
-#         -o smtpd_sasl_auth_enable=yes
-#         -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
-#         -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
-#         -o smtpd_sasl_type=dovecot
-#         -o smtpd_sasl_path=private/auth
+#       service lmtp {
+#       unix_listener /var/spool/postfix/private/dovecot-lmtp { # unix_listener $PATH_TO_SOCKET
+#         mode = 0600                                           # Socket permissions
+#         user = postfix                                        # Socket owner
+#         group = postfix                                       # Socket group
+#         }
+#       }
 
-#       # Explanations:
-#       #  -o syslog_name=postfix/submission: The name with which submission related events are logged
-#       #  -o smtpd_sasl_auth_enable=yes:     Enable sasl authentication (`plain` in our case)
-#       #  -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject: Permit recepients outside of $mynetworks only to authenticated users
-#       #  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject: Allow mail relaying only for authenticated users
-#       #  -o smtpd_sasl_type=dovecot:      Set dovecot as the SASL provider
-#       #  -o smtpd_sasl_path=private/auth: Set authentication socket location
+# - name: Update Dovecot mailbox_transport  
+#   replace:
+#     path: /etc/dovecot/conf.d/10-ssl.conf
+#     regexp: '#?mailbox_transport \s*=.*[^#\n]' 
+#     replace: mailbox_transport  = lmtp:unix:private/dovecot-lmtp # mailbox_transport = lmtp:unix:/var/lib/imap/socket/lmtp
+#   notify:
+#   - Restart Dovecot
+#   - Restart Postfix
 
+# # - name: Set postfix to also listen on submission port 
+# #   blockinfile:
+# #     path: /etc/postfix/master.cf
+# #     state: present
+# #     block: |
+# #       submission inet n       -       n       -       -       smtpd
+# #         -o syslog_name=postfix/submission
+# #         -o smtpd_sasl_auth_enable=yes
+# #         -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+# #         -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+# #         -o smtpd_sasl_type=dovecot
+# #         -o smtpd_sasl_path=private/auth
 
-
-- name: Define auth service
-  blockinfile:
-    path: /etc/dovecot/conf.d/10-master.conf
-    state: present
-    block: |
-      service auth {
-        unix_listener /var/spool/postfix/private/auth {
-          mode = 0600
-          user = postfix
-          group = postfix
-        }
-      }
-
-
-
-
-
-
-
-
-
+# #       # Explanations:
+# #       #  -o syslog_name=postfix/submission: The name with which submission related events are logged
+# #       #  -o smtpd_sasl_auth_enable=yes:     Enable sasl authentication (`plain` in our case)
+# #       #  -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject: Permit recepients outside of $mynetworks only to authenticated users
+# #       #  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject: Allow mail relaying only for authenticated users
+# #       #  -o smtpd_sasl_type=dovecot:      Set dovecot as the SASL provider
+# #       #  -o smtpd_sasl_path=private/auth: Set authentication socket location
 
 
 
+# - name: Define auth service
+#   blockinfile:
+#     path: /etc/dovecot/conf.d/10-master.conf
+#     state: present
+#     block: |
+#       service auth {
+#         unix_listener /var/spool/postfix/private/auth {
+#           mode = 0600
+#           user = postfix
+#           group = postfix
+#         }
+#       }
 
-# 6 Setting up a web service for mailbox access
 
 
-- name: Install dnf package
-  dnf:
-    autoremove: yes
-  with_items:
-  - epel-release
-  - dnf-plugins-core
 
-# dnf config-manager --set-enabled crb # TODO
-# - name: Enable CRB repository
+
+
+
+
+
+
+
+
+
+# # 6 Setting up a web service for mailbox access
+
+
+# - name: Install dnf package
 #   dnf:
-#     name: crb
-#     enablerepo: crb
+#     autoremove: yes
+#   with_items:
+#   - epel-release
+#   - dnf-plugins-core
 
-- name: Install yum package
-  yum:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - ImageMagick
-    - ImageMagick-devel
-    - ImageMagick-perl
-    - pcre-devel
-    - zlib
-    - zlib-devel
-    - libzip
-    #- libzip-devel # libzip-devel failed
-    - libmcrypt-devel
-    - php
-    - php-fpm
-    - php-devel
-    - php-pear
-    - php-cli
-    - php-gd
-    - php-curl
-    - php-xml
-    - php-mysqlnd
-    - php-mbstring
-    - php-intl
-    - php-ldap
-    - mariadb
-    - mariadb-server
-    - httpd
+# # dnf config-manager --set-enabled crb # TODO
+# # - name: Enable CRB repository
+# #   dnf:
+# #     name: crb
+# #     enablerepo: crb
+
+# - name: Install yum package
+#   yum:
+#     name: "{{ item }}"
+#     state: present
+#   with_items:
+#     - ImageMagick
+#     - ImageMagick-devel
+#     - ImageMagick-perl
+#     - pcre-devel
+#     - zlib
+#     - zlib-devel
+#     - libzip
+#     #- libzip-devel # libzip-devel failed
+#     - libmcrypt-devel
+#     - php
+#     - php-fpm
+#     - php-devel
+#     - php-pear
+#     - php-cli
+#     - php-gd
+#     - php-curl
+#     - php-xml
+#     - php-mysqlnd
+#     - php-mbstring
+#     - php-intl
+#     - php-ldap
+#     - mariadb
+#     - mariadb-server
+#     - httpd
   
-- name: Install pecl package
-  community.general.pear:
-    name: pecl/json_post
-    state: present
-  with_items:
-  - imagick
-  - mcrypt 
-  - zip 
+# - name: Install pecl package
+#   community.general.pear:
+#     name: pecl/json_post
+#     state: present
+#   with_items:
+#   - imagick
+#   - mcrypt 
+#   - zip 
 
-- name: Create extensions file
-  file:
-    path: /etc/php.d/
-    dest: "20-{{ item }}.ini"
-    owner: root
-    group: root
-    mode: '0755'
-    access_time: preserve
-    modification_time: preserve 
-    state: touch
-    content: "extension={{ item }}"
-  with_items:
-  - imagick
-  - mcrypt 
-  - zip 
+# - name: Create extensions file
+#   file:
+#     path: /etc/php.d/
+#     dest: "20-{{ item }}.ini"
+#     owner: root
+#     group: root
+#     mode: '0755'
+#     access_time: preserve
+#     modification_time: preserve 
+#     state: touch
+#     content: "extension={{ item }}"
+#   with_items:
+#   - imagick
+#   - mcrypt 
+#   - zip 

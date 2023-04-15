@@ -1,3 +1,11 @@
+postfix_conf_inet_protocols: ipv4 # all
+postfix_conf_myhostname: "{{ hostname }}" # b75914.sa.cs.ut.ee
+postfix_conf_inet_interfaces: all # localhost
+postfix_conf_mynetworks_style: host # ""
+postfix_conf_relayhost: "" # # ""
+postfix_conf_mynetworks: "" #127.0.0.1/32 192.168.42.110/32
+
+
 mailuser_password: pass
 
 newline_regex: '\s*=.*[^#\n]'
