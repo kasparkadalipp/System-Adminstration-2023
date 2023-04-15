@@ -86,7 +86,6 @@
 - name: Create necessary files for logging
   file:
     path: /var/named/log/
-    dest: "{{item}}"
     owner: named
     group: named
     mode: '0755'
@@ -99,7 +98,7 @@
   - zone_transfers
   - client_security
   - queries
-  - query-errors
+  - query-errorsetc/named/b75914Update /etc/
 
 # Creating a Personal Domain for named
 

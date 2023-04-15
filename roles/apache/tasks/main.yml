@@ -1,25 +1,26 @@
 # 3.1 Understanding DNS CNAME records
-- name: Append cname to /etc/named/{{dns_zone}}
-  ansible.builtin.lineinfile:
-    path: /etc/named/{{dns_zone}}
-    state: present
-    regexp: "{{item}} IN CNAME {{dns_zone}}."
-    line: "{{item}} IN CNAME {{dns_zone}}."
-  register: cname
-  with_items:
-  - www
-  - proxy
-  - wordpress
+# REPLACED WITH TEMPLATE
+# - name: Append cname to /etc/named/{{dns_zone}}
+#   ansible.builtin.lineinfile:
+#     path: /etc/named/{{dns_zone}}
+#     state: present
+#     regexp: "{{item}} IN CNAME {{dns_zone}}."
+#     line: "{{item}} IN CNAME {{dns_zone}}."
+#   register: cname
+#   with_items:
+#   - www
+#   - proxy
+#   - wordpress
 
-- name: Update /etc/named/{{dns_zone}} serial
-  replace:
-    path: /etc/named/{{dns_zone}}
-    regexp: '\d{10}'
-    replace: "{{ lookup('pipe', 'date +%Y%m%d10') }}" # TODO better increment
-  when: cname.changed
-  notify:
-  - Restart DNS
-  - Restart Apache
+# - name: Update /etc/named/b75914.sa.cs.ut.ee serial
+#   replace:
+#     path: /etc/named/{{dns_zone}}
+#     regexp: '\d{10}'
+#     replace: "{{ lookup('pipe', 'date +%Y%m%d10') }}" # TODO better increment
+#   when: cname.changed
+#   notify:
+#   - Restart DNS
+#   - Restart Apache
 
 # 3.2 Virtual Web Hosts Using Apache Web Server
 - name: Install httpd using dnf
@@ -51,7 +52,7 @@
 
 - name: Create /etc/httpd/conf.d/www.{{hostname}}.conf
   template:
-    src: www.(vm_name).conf.j2
+    src: www.b75914.conf.j2
     dest: /etc/httpd/conf.d/www.{{hostname}}.conf
     owner: root
     group: root
@@ -81,16 +82,16 @@
     name: flask
 
 - name: Create /etc/systemd/system/proxy.service
-  template:
-    src: proxy.service.j2
+  copy:
+    src: proxy.service
     dest: /etc/systemd/system/proxy.service
     owner: proxy
     group: root
     mode: '0755'
     
 - name: Create proxy /usr/local/lib/server.py
-  template:
-    src: server.py.j2
+  copy:
+    src: server.py
     dest: /usr/local/lib/server.py
     owner: proxy
     group: root
@@ -251,13 +252,9 @@
   - proxy
 
 - name:  Security-hardening using mod_security
-  lineinfile:
-    path: /etc/httpd/modsecurity.d/local_rules/modsecurity_localrules.conf
-    state: present
-    regexp: "{{item}}"
-    line: "{{item}}"
-  with_items:
-  - SecDefaultAction "phase:2,deny,log,status:406"
-  - SecRule REQUEST_URI "etc/passwd" "id:'500001'"
-  - SecRule REQUEST_URI "\.\./" "id:'500002'"
-  - SecRule ARGS "<[Ss][Cc][Rr][Ii][Pp][Tt]" "id:'500003'"
+  copy:
+    src: modsecurity_localrules.conf
+    dest: /etc/httpd/modsecurity.d/local_rules/modsecurity_localrules.conf
+    owner: root
+    group: root
+    mode: '0644'

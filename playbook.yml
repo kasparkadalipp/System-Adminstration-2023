@@ -7,8 +7,10 @@
   - domain_name: sa.cs.ut.ee
   - ip_address: 172.17.91.192
   - dns_zone: "{{hostname}}.sa.cs.ut.ee"
-  - mysql_root_password: pass
   - dns_serial_counter: 1
+
+  # don't change
+  - mysql_root_password: pass
   - dns_serial_counter_formatted: '{{ "%02d" | format(dns_serial_counter | int) }}'
   - dns_serial: "{{'%Y%m%d' | strftime(ansible_date_time.epoch) }}{{dns_serial_counter}}"
   
@@ -31,5 +33,5 @@
   roles:
   # - { role: etais, tags: etais } 
   # - { role: dns, tags: dns }
-  # - { role: apache, tags: apache}
+  - { role: apache, tags: apache}
   # - { role: email, tags: email}
