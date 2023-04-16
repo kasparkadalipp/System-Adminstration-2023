@@ -1,0 +1,108 @@
+- name: Install dnf package
+  dnf:
+    state: present
+    name: "{{ item }}"
+    with_items:
+    - epel-release
+    - dnf-plugins-core
+
+- name: dnf config-manager --set-enabled crb
+  command: dnf config-manager --set-enabled crb
+
+- name: Install yum package
+  yum:
+    state: present
+    name: "{{ item }}"
+    with_items:
+    - ImageMagick
+    - ImageMagick-devel
+    - ImageMagick-perl
+    - pcre-devel
+    - zlib
+    - zlib-devel
+    - libzip
+    - libzip-devel # libzip-devel failed
+    - libmcrypt-devel
+    - php
+    - php-fpm
+    - php-devel
+    - php-pear
+    - php-cli
+    - php-gd
+    - php-curl
+    - php-xml
+    - php-mysqlnd
+    - php-mbstring
+    - php-intl
+    - php-ldap
+    - mariadb
+    - mariadb-server
+    - httpd
+  
+- name: Install pecl package
+  command: "pecl install {{ item }}"
+  with_items:
+   - imagick
+   - mcrypt 
+   - zip 
+
+- name: Create .ini extensions file
+  template:
+    src: "20-<extension-name>.ini.j2"
+    dest: "/etc/php.d/20-{{ item }}.ini"
+    owner: root
+    group: root
+    mode: '0644'
+  vars:
+    extension_name: "{{ item }}"
+  with_items:
+  - imagick
+  - mcrypt 
+  - zip 
+
+- name: Extract wordpress.tar.gz
+  unarchive:
+    src: https://github.com/roundcube/roundcubemail/releases/download/1.6.1/roundcubemail-1.6.1-complete.tar.gz
+    dest: /var/www/html
+    remote_src: yes
+    extra_opts: 
+    - --transform
+    - 's|^[^/]*|roundcubemail|'
+    creates: /var/www/html/roundcubemail
+
+- name: Set ownership of roundcubemail directory to apache:apache
+  file:
+    path: /var/www/html/roundcubemail
+    state: directory
+    owner: apache
+    group: apache
+    recurse: yes
+
+- name: Sefcontext | this equates to 'chcon -t httpd_sys_rw_content_t /var/www/html/roundcubemail -R'
+  sefcontext:
+    target: '/var/www/html/roundcubemail(/.*)?'
+    setype: httpd_sys_rw_content_t
+    state: present
+
+- name: Create roundcubemail database
+  mysql_db:
+    name: "{{ roudcube_database_name }}"
+    state: present
+    collation: utf8_general_ci
+    encoding: utf8
+    
+- name: Create roundcube user
+  mysql_user:
+    name: "{{ roudcube_database_user }}"
+    password: "{{ roudcube_database_user_password }}"
+    priv: "roundcubemail.*:ALL"
+
+- name: Create Roudcube virtual host
+  template:
+    src: mail.b75914.sa.cs.ut.ee.conf.j2
+    dest: "/etc/httpd/conf.d/mail.{{ dns_zone}}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+  - Restart Apache

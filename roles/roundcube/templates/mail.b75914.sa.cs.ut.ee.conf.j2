@@ -1,0 +1,12 @@
+<VirtualHost *:80>
+  ServerAdmin root@{{dns_zone}}
+  ServerName mail.{{dns_zone}}
+  DocumentRoot /var/www/html/roundcubemail 
+  <Directory /var/www/html/roundcubemail>
+      Allowoverride all
+  </Directory>
+
+  ErrorLog /var/log/httpd/mail.{{dns_zone}}-error.log
+  CustomLog /var/log/httpd/mail.{{dns_zone}}-access.log combined
+  ForensicLog /var/log/httpd/mail.{{dns_zone}}-forensic.log
+</VirtualHost>
