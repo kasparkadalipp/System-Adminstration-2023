@@ -1,0 +1,31 @@
+- name: Add certificate file
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/pki/tls/certs/{{ item }}"
+    owner: root
+    group: root
+    mode: '0777'
+  with_items:
+  - proxy_server.crt
+  - www_server.crt
+  - wordpress_server.crt
+
+- name: Add key
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/pki/tls/private/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+  - proxy_server.key
+  - www_server.key
+  - wordpress_server.key
+
+- name: Add shared certificate
+  copy:
+    src: cacert.crt
+    dest: /etc/pki/tls/certs/cacert.crt
+    owner: root
+    group: root
+    mode: '0777'
