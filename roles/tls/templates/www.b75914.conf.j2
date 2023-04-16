@@ -1,0 +1,10 @@
+<VirtualHost *:443>
+ ServerName www.{{dns_zone}}
+ DocumentRoot /var/www/html/www.{{hostname}}/public_html
+ # Possible values include: debug, info, notice, warn, error, crit, alert, emerg.
+ LogLevel debug
+
+ ErrorLog /var/log/httpd/www.{{hostname}}-error.log
+ CustomLog /var/log/httpd/www.{{hostname}}-access.log combined
+ ForensicLog /var/log/httpd/www.{{hostname}}-forensic.log
+</VirtualHost>

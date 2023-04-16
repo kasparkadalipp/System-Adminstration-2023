@@ -1,0 +1,3 @@
+- name: Install yum package
+  yum:
+   name: mod_ssl
