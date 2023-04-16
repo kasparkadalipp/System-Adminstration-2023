@@ -52,9 +52,7 @@ service submission-login {
 }
 
 service lmtp {
-  unix_listener lmtp {
-    #mode = 0666
-  }
+  {{ dovecot_service_lmtp }}
 
   # Create inet listener only if you can't use the above UNIX socket
   #inet_listener lmtp {
@@ -97,11 +95,7 @@ service auth {
   # To give the caller full permissions to lookup all users, set the mode to
   # something else than 0666 and Dovecot lets the kernel enforce the
   # permissions (e.g. 0777 allows everyone full permissions).
-  unix_listener auth-userdb {
-    #mode = 0666
-    #user = 
-    #group = 
-  }
+  {{ dovecot_service_auth }}
 
   # Postfix smtp-auth
   #unix_listener /var/spool/postfix/private/auth {

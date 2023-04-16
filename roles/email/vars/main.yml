@@ -8,14 +8,31 @@ postfix_conf_mynetworks_style: host # ""
 postfix_mydomain: $myhostname # domain.tld
 postfix_myorigin: $mydomain
 postfix_mydestination: "mail.{{dns_zone}}, localhost.{{dns_zone}}, localhost, {{dns_zone}}"
+postfix_mailbox_transport: "lmtp:unix:private/dovecot-lmtp"
 # not used
 postfix_relayhost: ""
 postfix_mynetworks: "" # 127.0.0.1/32 192.168.42.183/32
 
+# master.cf
+postfix_submission_inet: |
+  submission inet n       -       n       -       -       smtpd
+    -o syslog_name=postfix/submission
+    -o smtpd_sasl_auth_enable=yes
+    -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+    -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+    -o smtpd_sasl_type=dovecot
+    -o smtpd_sasl_path=private/auth
+
+  # Explanations:
+  #  -o syslog_name=postfix/submission: The name with which submission related events are logged
+  #  -o smtpd_sasl_auth_enable=yes:     Enable sasl authentication (`plain` in our case)
+  #  -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject: Permit recepients outside of $mynetworks only to authenticated users
+  #  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject: Allow mail relaying only for authenticated users
+  #  -o smtpd_sasl_type=dovecot:      Set dovecot as the SASL provider
+  #  -o smtpd_sasl_path=private/auth: Set authentication socket location
 
 # dovecot.conf
-dovecot_protocols: imap # imap pop3 lmtp submission
-# dovecot_protocols: imap lmtp # task 5.3
+dovecot_protocols: imap lmtp # imap pop3 lmtp submission
 
 # 10-logging.conf
 dovecot_mail_debug: "yes" # no
@@ -33,6 +50,18 @@ dovecot_mail_privileged_group: mail
 dovecot_ssl: "no" # required
 
 # 10-master.conf
+dovecot_service_lmtp: | # mode = 0666
+  unix_listener /var/spool/postfix/private/dovecot-lmtp { # unix_listener $PATH_TO_SOCKET
+    mode = 0600                                           # Socket permissions
+    user = postfix                                        # Socket owner
+    group = postfix                                       # Socket group
+    }
+dovecot_service_auth:  | # unix_listener auth-userdb #mode 0666 #user = #group =
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0600
+    user = postfix
+    group = postfix
+  }
 
 # 15-mailboxes.conf
 dovecot_mailbox_trash: |

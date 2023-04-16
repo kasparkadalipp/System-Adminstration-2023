@@ -8,13 +8,16 @@
     name: postfix
     state: present
 
-- name: Update Postfix main conf
+- name: Configure Postfix
   template:
-    src: main.cf.j2
-    dest: /etc/postfix/main.cf
+    src: "{{ item }}.j2"
+    dest: "/etc/postfix/{{ item }}"
     owner: root
     group: root
     mode: '0644'
+  with_items:
+  - main.cf
+  - master.cf
   notify:
   - Restart Postfix
 
@@ -111,38 +114,9 @@
     name: telnet
     state: present
 
-# - name: Add lmtp protocol to Dovecot main conf
-#   replace:
-#     path: /etc/dovecot/dovecot.conf
-#     regexp: '#?disable_plaintext_auth\s*=.*[^#\n]' 
-#     replace: disable_plaintext_auth = yes #disable_plaintext_auth = yes
-#   notify:
-#   - Restart Dovecot
 
-# # 5.3 Give mailbox handling from postfix to dovecot
+# 5.3 Give mailbox handling from postfix to dovecot
 
-
-# - name: Define lmtp listener
-#   blockinfile:
-#     path: /etc/dovecot/conf.d/10-master.conf
-#     state: present
-#     block: |
-#       service lmtp {
-#       unix_listener /var/spool/postfix/private/dovecot-lmtp { # unix_listener $PATH_TO_SOCKET
-#         mode = 0600                                           # Socket permissions
-#         user = postfix                                        # Socket owner
-#         group = postfix                                       # Socket group
-#         }
-#       }
-
-# - name: Update Dovecot mailbox_transport  
-#   replace:
-#     path: /etc/dovecot/conf.d/10-ssl.conf
-#     regexp: '#?mailbox_transport \s*=.*[^#\n]' 
-#     replace: mailbox_transport  = lmtp:unix:private/dovecot-lmtp # mailbox_transport = lmtp:unix:/var/lib/imap/socket/lmtp
-#   notify:
-#   - Restart Dovecot
-#   - Restart Postfix
 
 # # - name: Set postfix to also listen on submission port 
 # #   blockinfile:
