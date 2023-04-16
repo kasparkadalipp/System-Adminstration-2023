@@ -1,9 +1,19 @@
 # 4. Postfix
 
-- name: Install Postfix
+- name: Yum install packages
   yum:
-    name: postfix
+    name: "{{ item }}"
     state: present
+  with_items:
+    - postfix
+    - mod_ssl
+    - cyrus-sasl-plain
+    - telnet
+    - dovecot
+
+- name: Pip install passlib
+  pip:
+    name: passlib
 
 - name: Configure Postfix
   template:
@@ -24,10 +34,6 @@
     state: started
     enabled: true
 
-- name: Install passlib
-  pip:
-    name: passlib
-
 - name: Add user mailuser
   user:
     name: mailuser
@@ -37,11 +43,6 @@
 # Sending an e-mail task # TODO
 
 # 5. Dovecot
-
-- name: Install Dovecot
-  yum:
-    name: dovecot
-    state: present
 
 - name: Ensure Dovecot service is running
   systemd:
@@ -102,14 +103,10 @@
   - 25
   - 143
   - 465
+  - 587
   - 993
   notify:
   - Restart firewall
-
-- name: Install telnet
-  yum:
-    name: telnet
-    state: present
 
 # # 6 Setting up a web service for mailbox access
 

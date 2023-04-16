@@ -9,12 +9,18 @@ postfix_mydomain: $myhostname # domain.tld
 postfix_myorigin: $mydomain
 postfix_mydestination: "mail.{{dns_zone}}, localhost.{{dns_zone}}, localhost, {{dns_zone}}"
 postfix_mailbox_transport: "lmtp:unix:private/dovecot-lmtp"
+# tls
+postfix_smtpd_tls_security_level: may
+postfix_smtpd_tls_cert_file: /etc/pki/tls/certs/postfix.pem
+postfix_smtpd_tls_key_file: /etc/pki/tls/private/postfix.key
+postfix_smtpd_tls_loglevel: "1"
+postfix_smtp_tls_loglevel: "1"
 # not used
 postfix_relayhost: ""
 postfix_mynetworks: "" # 127.0.0.1/32 192.168.42.183/32
 
 # master.cf
-postfix_submission_inet: |
+postfix_submission_inet_submission: |
   submission inet n       -       n       -       -       smtpd
     -o syslog_name=postfix/submission
     -o smtpd_sasl_auth_enable=yes
@@ -30,6 +36,33 @@ postfix_submission_inet: |
   #  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject: Allow mail relaying only for authenticated users
   #  -o smtpd_sasl_type=dovecot:      Set dovecot as the SASL provider
   #  -o smtpd_sasl_path=private/auth: Set authentication socket location
+
+# tls TODO add to master.cf
+# postfix_submission_inet_submission: |
+#   submission inet n       -       n       -       -       smtpd
+#     -o syslog_name=postfix/submission
+#     -o smtpd_tls_security_level=encrypt
+#     -o smtpd_sasl_auth_enable=yes
+#     -o smtpd_tls_auth_only=yes
+#     -o smtpd_reject_unlisted_recipient=no
+#     -o smtpd_client_restrictions=$mua_client_restrictions
+#     -o smtpd_helo_restrictions=$mua_helo_restrictions
+#     -o smtpd_sender_restrictions=$mua_sender_restrictions
+#     -o smtpd_recipient_restrictions=
+#     -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+#     -o milter_macro_daemon_name=ORIGINATING
+
+# tls TODO add to master.cf
+# postfix_submission_inet_smtps: |
+#   smtps     inet  n       -       n       -       -       smtpd
+#     -o syslog_name=postfix/smtps
+#     -o smtpd_tls_wrappermode=yes
+#     -o smtpd_sasl_auth_enable=yes
+#     -o smtpd_sasl_path=private/auth
+#     -o smtpd_sasl_security_options=noanonymous
+#     -o smtpd_client_restrictions=permit_sasl_authenticated,reject
+#     -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+#     -o milter_macro_daemon_name=ORIGINATING
 
 # dovecot.conf
 dovecot_protocols: imap lmtp # imap pop3 lmtp submission

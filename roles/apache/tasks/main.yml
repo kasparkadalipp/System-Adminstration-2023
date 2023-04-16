@@ -14,6 +14,14 @@
   notify:
   - Restart firewall
 
+- name: permit traffic on port 80/tcp
+  firewalld:
+    port: 443/tcp
+    permanent: true
+    state: enabled
+  notify:
+  - Restart firewall
+
 - name: Create directory /var/www/html/www.{{hostname}}/public_html
   file:
     path: /var/www/html/www.{{hostname}}/public_html
