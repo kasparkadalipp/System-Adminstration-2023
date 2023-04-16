@@ -1,0 +1,9 @@
+- name: Permit traffic on port
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: enabled
+  with_items:
+  - 5005
+  notify:
+  - Restart firewall
