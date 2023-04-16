@@ -75,6 +75,12 @@
     group: root
     mode: '0644'
 
+- name: Ensure Proxy service is running
+  systemd:
+    name: proxy
+    state: started
+    enabled: true
+
 - name: Set httpd_can_network_connect flag on and keep it persistent across reboots
   seboolean:
     name: httpd_can_network_connect
