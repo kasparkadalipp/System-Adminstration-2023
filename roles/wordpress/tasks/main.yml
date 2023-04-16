@@ -77,7 +77,7 @@
     setype: httpd_sys_rw_content_t
     state: present
 
-- name: Create WordPress log file
+- name: Create WordPress log files
   file:
     path: "{{ item }}"
     owner: apache
@@ -87,11 +87,10 @@
     modification_time: preserve 
     state: touch
   with_items:
-  - "{{ php_gpm_conf_log }}"
-  - "{{ www_php_gpm_conf_log }}"
+  - /var/log/httpd/php-errors.log
+  - /var/log/httpd/www-php-errors.log
 
-# TODO uncomment, copy initial values and change to error log path
-- name: Change WordPress PHP log locations
+- name: Update WordPress PHP log file locations
   copy:
     src: "{{item.src}}"
     dest: "{{item.dest}}"
