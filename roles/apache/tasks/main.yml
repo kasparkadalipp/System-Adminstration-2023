@@ -1,7 +1,7 @@
 # 3.1 Understanding DNS CNAME records (added to template)
 
 # 3.2 Virtual Web Hosts Using Apache Web Server
-- name: Install httpd using dnf
+- name: Yum install httpd
   yum:
     name: httpd
     state: present
