@@ -14,7 +14,7 @@
   notify:
   - Restart firewall
 
-- name: permit traffic on port 80/tcp
+- name: permit traffic on port 443/tcp
   firewalld:
     port: 443/tcp
     permanent: true
