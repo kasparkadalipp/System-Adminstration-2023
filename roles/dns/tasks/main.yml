@@ -118,22 +118,6 @@
     group: named
     mode: '0750'
 
-- name: Creating a Personal Domain for named {{dns_zone}}
-  template:
-    src: b75914.sa.cs.ut.ee.j2
-    dest: /etc/named/{{hostname}}.sa.cs.ut.ee
-    owner: root
-    group: named
-    mode: '0644'
-
-- name: Reverse DNS Domain for named {{reverse_dns}}
-  template:
-    src: (reversed_domain).in-addr.arpa.j2
-    dest: /etc/named/{{reverse_dns}}
-    owner: root
-    group: named
-    mode: '0644'
-
 - name: Update resolv.conf
   template:
     src: resolv.conf.j2
@@ -142,6 +126,25 @@
     group: root
     mode: '0644'
 
+- name: Creating a Personal Domain for named {{dns_zone}}
+  template:
+    src: b75914.sa.cs.ut.ee.j2
+    dest: /etc/named/{{hostname}}.sa.cs.ut.ee
+    owner: root
+    group: named
+    mode: '0644'
+  notify:
+  - Restart Apache
+
+- name: Reverse DNS Domain for named {{reverse_dns}}
+  template:
+    src: (reversed_domain).in-addr.arpa.j2
+    dest: /etc/named/{{reverse_dns}}
+    owner: root
+    group: named
+    mode: '0644'
+  notify:
+  - Restart Apache
 
 - name: Reload service firewalld
   systemd:

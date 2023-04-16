@@ -2,12 +2,15 @@
   user: centos
   become: yes
   become_user: root
+  handlers:
+   - name: Global handlers
+     import_tasks: handlers/restarts.yml
   vars:
   - hostname: b75914
   - domain_name: sa.cs.ut.ee
   - ip_address: 172.17.91.191
   - dns_zone: "{{hostname}}.sa.cs.ut.ee"
-  - dns_serial_counter: 3
+  - dns_serial_counter: 1
 
   # don't change
   - mysql_root_password: pass
@@ -19,7 +22,6 @@
     debug:
      msg: Hello
 
-
   roles:
   # - { role: etais, tags: etais } 
   # - { role: dns, tags: dns }
@@ -27,4 +29,4 @@
   # mysql_secure_installation
   # - { role: wordpress, tags: apache}
   # - { role: email, tags: email}
-  - { role: roundcube, tags: email}
+  # - { role: roundcube, tags: email}

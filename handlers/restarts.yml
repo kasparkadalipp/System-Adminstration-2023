@@ -1,0 +1,24 @@
+- name: Restart Apache
+  service:
+    name: httpd 
+    state: restarted
+
+- name: Restart firewall
+  systemd:
+    name: firewalld
+    state: restarted
+
+- name: Restart DNS
+  systemd:
+    name: named
+    state: restarted
+
+- name: Restart Postfix
+  systemd:
+    name: postfix
+    state: restarted
+
+- name: Restart Dovecot
+  systemd:
+    name: dovecot
+    state: restarted
