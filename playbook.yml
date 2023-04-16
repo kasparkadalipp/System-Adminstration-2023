@@ -28,6 +28,6 @@
   - { role: apache, tags: apache}
   # mysql_secure_installation
   - { role: wordpress, tags: apache}
-  - { role: email, tags: email}
+  - { role: email, tags: email} # Manually send e-mail for task
   - { role: roundcube, tags: email}
   - { role: tls, tags: tls}

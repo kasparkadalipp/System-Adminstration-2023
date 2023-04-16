@@ -1,6 +1,4 @@
-# mysql_secure_installation # TODO
-
-- name: Testing this out
+- name: Reminder
   debug: 
     msg: "Run mysql_secure_installation if this fails"
 

@@ -40,7 +40,7 @@
     password: "{{ mailuser_password | password_hash('sha512') }}"
     state: present
 
-# Sending an e-mail task # TODO
+# Manually send e-mail for task
 
 # 5. Dovecot
 
