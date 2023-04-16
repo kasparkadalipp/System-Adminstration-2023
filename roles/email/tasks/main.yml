@@ -117,55 +117,6 @@
 
 # 5.3 Give mailbox handling from postfix to dovecot
 
-
-# # - name: Set postfix to also listen on submission port 
-# #   blockinfile:
-# #     path: /etc/postfix/master.cf
-# #     state: present
-# #     block: |
-# #       submission inet n       -       n       -       -       smtpd
-# #         -o syslog_name=postfix/submission
-# #         -o smtpd_sasl_auth_enable=yes
-# #         -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
-# #         -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
-# #         -o smtpd_sasl_type=dovecot
-# #         -o smtpd_sasl_path=private/auth
-
-# #       # Explanations:
-# #       #  -o syslog_name=postfix/submission: The name with which submission related events are logged
-# #       #  -o smtpd_sasl_auth_enable=yes:     Enable sasl authentication (`plain` in our case)
-# #       #  -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject: Permit recepients outside of $mynetworks only to authenticated users
-# #       #  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject: Allow mail relaying only for authenticated users
-# #       #  -o smtpd_sasl_type=dovecot:      Set dovecot as the SASL provider
-# #       #  -o smtpd_sasl_path=private/auth: Set authentication socket location
-
-
-
-# - name: Define auth service
-#   blockinfile:
-#     path: /etc/dovecot/conf.d/10-master.conf
-#     state: present
-#     block: |
-#       service auth {
-#         unix_listener /var/spool/postfix/private/auth {
-#           mode = 0600
-#           user = postfix
-#           group = postfix
-#         }
-#       }
-
-
-
-
-
-
-
-
-
-
-
-
-
 # # 6 Setting up a web service for mailbox access
 
 
