@@ -2,9 +2,9 @@
   dnf:
     state: present
     name: "{{ item }}"
-    with_items:
-    - epel-release
-    - dnf-plugins-core
+  with_items:
+  - epel-release
+  - dnf-plugins-core
 
 - name: dnf config-manager --set-enabled crb
   command: dnf config-manager --set-enabled crb
@@ -13,31 +13,31 @@
   yum:
     state: present
     name: "{{ item }}"
-    with_items:
-    - ImageMagick
-    - ImageMagick-devel
-    - ImageMagick-perl
-    - pcre-devel
-    - zlib
-    - zlib-devel
-    - libzip
-    - libzip-devel # libzip-devel failed
-    - libmcrypt-devel
-    - php
-    - php-fpm
-    - php-devel
-    - php-pear
-    - php-cli
-    - php-gd
-    - php-curl
-    - php-xml
-    - php-mysqlnd
-    - php-mbstring
-    - php-intl
-    - php-ldap
-    - mariadb
-    - mariadb-server
-    - httpd
+  with_items:
+  - ImageMagick
+  - ImageMagick-devel
+  - ImageMagick-perl
+  - pcre-devel
+  - zlib
+  - zlib-devel
+  - libzip
+  - libzip-devel
+  - libmcrypt-devel
+  - php
+  - php-fpm
+  - php-devel
+  - php-pear
+  - php-cli
+  - php-gd
+  - php-curl
+  - php-xml
+  - php-mysqlnd
+  - php-mbstring
+  - php-intl
+  - php-ldap
+  - mariadb
+  - mariadb-server
+  - httpd
   
 - name: Install pecl package
   command: "pecl install {{ item }}"
