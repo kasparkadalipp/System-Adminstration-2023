@@ -81,6 +81,7 @@ dovecot_mail_privileged_group: mail
 
 # 10-SSL.conf
 dovecot_ssl: "no" # required
+# dovecot_ssl: "yes" # TODO uncomment
 
 # 10-master.conf
 dovecot_service_lmtp: | # mode = 0666

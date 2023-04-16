@@ -7,4 +7,9 @@
  ErrorLog /var/log/httpd/wordpress-error.log
  CustomLog /var/log/httpd/wordpress-access.log combined
  ForensicLog /var/log/httpd/wordpress-forensic.log
+
+ SSLEngine on
+ SSLCertificateFile /etc/pki/tls/certs/wordpress_server.crt
+ SSLCertificateKeyFile /etc/pki/tls/private/wordpress_server.key
+ SSLCACertificateFile /etc/pki/tls/certs/cacert.crt
 </VirtualHost>

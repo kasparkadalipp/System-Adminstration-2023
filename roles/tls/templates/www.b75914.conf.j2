@@ -7,4 +7,9 @@
  ErrorLog /var/log/httpd/www.{{hostname}}-error.log
  CustomLog /var/log/httpd/www.{{hostname}}-access.log combined
  ForensicLog /var/log/httpd/www.{{hostname}}-forensic.log
+
+ SSLEngine on
+ SSLCertificateFile /etc/pki/tls/certs/www_server.crt
+ SSLCertificateKeyFile /etc/pki/tls/private/www_server.key
+ SSLCACertificateFile /etc/pki/tls/certs/cacert.crt
 </VirtualHost>
