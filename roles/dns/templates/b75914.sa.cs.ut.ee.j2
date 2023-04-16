@@ -8,7 +8,7 @@ $TTL    15M
                            120M         ; Expire
                             600 )       ; Negative Cache TTL
 @              IN      NS      ns1
-{{dns_zone}}. IN MX 10 mail.{{dns_zone}}.
+@              IN      MX  10  mail.{{dns_zone}}.
 @              IN      A       {{ip_address}}
 ns1            IN      A       {{ip_address}}
 {{hostname}}   IN      A       {{ip_address}}
