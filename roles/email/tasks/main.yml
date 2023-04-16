@@ -65,7 +65,7 @@
   - 10-ssl.conf
   - 15-mailboxes.conf
   notify:
-  - Restart Dovecot
+  - Restart Postfix
 
 - name: Configure Dovecot
   template:

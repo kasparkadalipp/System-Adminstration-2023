@@ -82,6 +82,8 @@ dovecot_mail_privileged_group: mail
 # 10-SSL.conf
 dovecot_ssl: "no" # required
 # dovecot_ssl: "yes" # TODO uncomment
+dovecot_ssl_cert: </etc/pki/dovecot/certs/dovecot.pem
+dovecot_ssl_key: </etc/pki/dovecot/private/dovecot.pem
 
 # 10-master.conf
 dovecot_service_lmtp: | # mode = 0666

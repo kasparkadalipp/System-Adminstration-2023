@@ -1,4 +1,4 @@
-- name: Add certificate file
+- name: Add VirtualHost certificate file
   copy:
     src: "{{ item }}"
     dest: "/etc/pki/tls/certs/{{ item }}"
@@ -9,8 +9,10 @@
   - proxy_server.crt
   - www_server.crt
   - wordpress_server.crt
-
-- name: Add key
+  notify:
+  - Restart DNS
+  
+- name: Add VirtualHost ssl key
   copy:
     src: "{{ item }}"
     dest: "/etc/pki/tls/private/{{ item }}"
@@ -21,6 +23,8 @@
   - proxy_server.key
   - www_server.key
   - wordpress_server.key
+  notify:
+  - Restart DNS
 
 - name: Add shared certificate
   copy:
@@ -29,3 +33,25 @@
     owner: root
     group: root
     mode: '0777'
+  notify:
+  - Restart DNS
+
+- name: Add Dovecot certificate
+  copy:
+    src: "dovecot.crt"
+    dest: "/etc/pki/dovecot/certs/dovecot.pem"
+    owner: root
+    group: root
+    mode: '0777'
+  notify:
+  - Restart Dovecot
+
+- name: Add Dovecot ssl key
+  copy:
+    src: "dovecot.key"
+    dest: "/etc/pki/dovecot/private/dovecot.pem"
+    owner: root
+    group: root
+    mode: '0777'
+  notify:
+  - Restart Dovecot
