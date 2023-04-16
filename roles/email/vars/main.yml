@@ -2,12 +2,20 @@ mailuser_password: pass
 
 # main.cf
 postfix_conf_inet_protocols: ipv4 # all
-postfix_conf_myhostname: "{{ dns_zone }}" # b75914.sa.cs.ut.ee
+postfix_conf_myhostname: "mail.{{ dns_zone }}" # b75914.sa.cs.ut.ee
 postfix_conf_inet_interfaces: all # localhost
 postfix_conf_mynetworks_style: host # ""
 postfix_mydomain: $myhostname # domain.tld
 postfix_myorigin: $mydomain
-postfix_mydestination: mail.$myhostname, localhost.$myhostname, localhost, $myhostname
+postfix_mydestination: "mail.{{dns_zone}}, localhost.{{dns_zone}}, localhost, {{dns_zone}}"
+# not used
+postfix_relayhost: ""
+postfix_mynetworks: "" # 127.0.0.1/32 192.168.42.183/32
+
+
+# dovecot.conf
+dovecot_protocols: imap # imap pop3 lmtp submission
+# dovecot_protocols: imap lmtp # task 5.3
 
 # 10-logging.conf
 dovecot_mail_debug: "yes" # no
@@ -20,8 +28,7 @@ dovecot_auth_username_format: "%n" # %Lu
 dovecot_mail_location: "maildir:~/mail"
 dovecot_mail_privileged_group: mail
 
-# dovecot.conf
-dovecot_protocols: imap # lmtp TODO RE-ADD in 5.3 # imap pop3 lmtp submission
+# 10-master.conf
 
 # 15-mailboxes.conf
 dovecot_mailbox_trash: |
