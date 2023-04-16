@@ -61,7 +61,7 @@
   - 10-auth.conf
   - 10-mail.conf
   - 10-master.conf
-  - 10-SSL.conf
+  - 10-ssl.conf
   - 15-mailboxes.conf
   notify:
   - Restart Dovecot
