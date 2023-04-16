@@ -49,37 +49,24 @@
     state: started
     enabled: true
 
-- name: Configure Dovecot logging
+- name: Configure Dovecot
   template:
-    src: 10-logging.conf.j2
-    dest: /etc/dovecot/conf.d/10-logging.conf
+    src: "{{ item }}.j2"
+    dest: "/etc/dovecot/conf.d/{{ item }}"
     owner: root
     group: root
     mode: '0644'
+  with_items:
+  - 10-logging.conf
+  - 10-auth.conf
+  - 10-mail.conf
+  - 10-master.conf
+  - 10-SSL.conf
+  - 15-mailboxes.conf
   notify:
   - Restart Dovecot
 
-- name: Configure Dovecot authentication
-  template:
-    src: 10-auth.conf.j2
-    dest: /etc/dovecot/conf.d/10-auth.conf
-    owner: root
-    group: root
-    mode: '0644'
-  notify:
-  - Restart Dovecot
-
-- name: Configure Dovecot mail
-  template:
-    src: 10-mail.conf.j2
-    dest: /etc/dovecot/conf.d/10-mail.conf
-    owner: root
-    group: root
-    mode: '0644'
-  notify:
-  - Restart Dovecot
-
-- name: Configure Dovecot main conf
+- name: Configure Dovecot
   template:
     src: dovecot.conf.j2
     dest: /etc/dovecot/dovecot.conf
@@ -104,27 +91,6 @@
     group: mail
     mode: '2777'
 
-
-- name: Configure Dovecot mailbox
-  template:
-    src: 15-mailboxes.conf.j2
-    dest: /etc/dovecot/conf.d/15-mailboxes.conf
-    owner: root
-    group: root
-    mode: '0644'
-  notify:
-  - Restart Dovecot
-
-- name: Configure Dovecot master conf
-  template:
-    src: 10-master.conf.j2
-    dest: /etc/dovecot/conf.d/10-master.conf
-    owner: root
-    group: root
-    mode: '0644'
-  notify:
-  - Restart Dovecot
-
 # 5.2 Testing IMAP login
 
 - name: Permit traffic on port
@@ -145,22 +111,6 @@
     name: telnet
     state: present
 
-# - name: Update Dovecot disable_plaintext_auth 
-#   replace:
-#     path: /etc/dovecot/conf.d/10-auth.conf
-#     regexp: '#?disable_plaintext_auth\s*=.*[^#\n]' 
-#     replace: disable_plaintext_auth = yes #disable_plaintext_auth = yes
-#   notify:
-#   - Restart Dovecot
-    
-# - name: Update Dovecot disable_plaintext_auth 
-#   replace:
-#     path: /etc/dovecot/conf.d/10-ssl.conf
-#     regexp: '#?ssl\s*=.*[^#\n]' 
-#     replace: ssl = no # ssl = required
-#   notify:
-#   - Restart Dovecot
-    
 # - name: Add lmtp protocol to Dovecot main conf
 #   replace:
 #     path: /etc/dovecot/dovecot.conf

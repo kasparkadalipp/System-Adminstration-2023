@@ -23,10 +23,14 @@ dovecot_mail_debug: "yes" # no
 # 10-auth.conf
 dovecot_auth_mechanisms: plain login # plain
 dovecot_auth_username_format: "%n" # %Lu
+dovecot_disable_plaintext_auth: "no" # yes
 
 # 10-mail.conf
 dovecot_mail_location: "maildir:~/mail"
 dovecot_mail_privileged_group: mail
+
+# 10-SSL.conf
+dovecot_ssl: "no" # required
 
 # 10-master.conf
 
