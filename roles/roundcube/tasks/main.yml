@@ -39,8 +39,17 @@
   - mariadb-server
   - httpd
   
+# - name: Install pecl package
+#   command: "pecl install {{ item }}"
+#   with_items:
+#    - imagick
+#    - mcrypt 
+#    - zip 
+
 - name: Install pecl package
-  command: "pecl install {{ item }}"
+  community.general.pear:
+    name: "pecl/{{ item }}"
+    state: present
   with_items:
    - imagick
    - mcrypt 
