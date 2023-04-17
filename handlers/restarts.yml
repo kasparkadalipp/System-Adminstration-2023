@@ -22,3 +22,13 @@
   systemd:
     name: dovecot
     state: restarted
+
+- name: Restart PHP
+  systemd:
+    name: php-fpm
+    state: restarted
+
+- name: Restart MariaDB
+  systemd:
+    name: mariadb
+    state: restarted

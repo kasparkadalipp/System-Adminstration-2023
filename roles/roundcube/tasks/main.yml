@@ -54,7 +54,9 @@
    - imagick
    - mcrypt 
    - zip 
-
+  notify:
+  - Restart PHP
+ 
 - name: Create .ini extensions file
   template:
     src: "20-<extension-name>.ini.j2"
@@ -68,6 +70,8 @@
   - imagick
   - mcrypt 
   - zip 
+  notify:
+  - Restart PHP
 
 - name: Extract wordpress.tar.gz
   unarchive:
