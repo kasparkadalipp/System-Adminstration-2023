@@ -119,3 +119,11 @@
     mode: '0644'
   notify:
   - Restart Apache
+
+- name: Create Roundcube logging directory
+  file:
+    path: /var/log/roundcube
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
