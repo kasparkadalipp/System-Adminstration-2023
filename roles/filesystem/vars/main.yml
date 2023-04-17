@@ -1,0 +1,7 @@
+samba_conf: |
+  [smb]
+          comment = Samba share for SA lab
+          valid users = @samba_group
+          path = /shares/samba
+          browsable =yes
+          writable = yes

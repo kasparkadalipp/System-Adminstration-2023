@@ -4,7 +4,83 @@
     permanent: true
     state: enabled
   with_items:
+  - 111
   - 139
   - 445
+  - 2049
   notify:
   - Restart firewall
+
+- name: Yum install packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - nfs-utils
+    - samba
+    - samba-common
+    - samba-client
+    - cifs-utils
+
+- name: Create mount directory
+  file:
+    path: "{{item}}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  with_items:
+  - /lab8/fs-ext4
+  - /lab8/fs-xfs
+  - /shares/nfs
+  - /mnt/nfs
+
+- name: Ensure nfs-server service is running
+  systemd:
+    name: nfs-server
+    state: started
+    enabled: true
+
+- name: Ensure group "samba_group" exists
+  group:
+    name: samba_group
+    state: present
+
+- name: Add users to samba group
+  user:
+    name: "{{ item }}"
+    group: samba_group
+    append: yes
+  with_items:
+    - scoring 
+    - centos
+
+- name: Create samba directory
+  file:
+    path: /shares/samba
+    state: directory
+    owner: root
+    group: samba_group
+    mode: '0755'
+
+- name: Sefcontext | this equates to 'chcon -t samba_share_t  /shares/samba'
+  sefcontext:
+    target: '/shares/samba'
+    setype: samba_share_t
+    state: present
+    
+- name: Update samba conf
+  template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Ensure smb service is running
+  systemd:
+    name: smb
+    state: started
+    enabled: true
+
+# smbpasswd -a scoring # password should be: 2daysuperadmin
