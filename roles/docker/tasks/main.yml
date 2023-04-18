@@ -7,3 +7,75 @@
   - 5005
   notify:
   - Restart firewall
+
+- name: Create docker directory
+  file:
+    path: /etc/docker/
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create docker config
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install Docker repository dependency
+  yum:
+    name: yum-utils
+    state: present
+
+# doesn't work
+# - name: Set up Docker repository
+#   yum_repository:
+#     name: docker
+#     description: docker repository
+#     enabled: true
+#     baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+#     state: absent
+
+- name: Install docker
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+  - docker-ce 
+  - docker-ce-cli 
+  - containerd.io 
+  - docker-buildx-plugin 
+  - docker-compose-plugin
+
+- name: Ensure Docker service is running
+  systemd:
+    name: docker
+    state: started
+    enabled: true
+
+
+- name: Create docker directory
+  file:
+    path: /home/centos/flask_app
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create Dockerfile
+  copy:
+    src: Dockerfile
+    dest: /home/centos/flask_app/Dockerfile
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create server.py
+  copy:
+    src: server.py
+    dest: /home/centos/flask_app/server.py
+    owner: root
+    group: root
+    mode: '0644'
