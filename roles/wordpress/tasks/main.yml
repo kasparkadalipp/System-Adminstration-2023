@@ -105,14 +105,6 @@
     state: started
     enabled: true
 
-- name: Create /etc/httpd/conf.d/wordpress.conf
-  template:
-    src: wordpress.conf.j2
-    dest: /etc/httpd/conf.d/wordpress.conf
-    owner: root
-    group: root
-    mode: '0644'
-
 # 5. Configuring Apache modules
 - name: Enable forensic logging
   lineinfile:

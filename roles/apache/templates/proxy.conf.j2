@@ -1,5 +1,5 @@
 <VirtualHost *:80>
-    ServerName proxy.{{hostname}}.sa.cs.ut.ee
+    ServerName proxy.{{dns_zone}}
     # ServerName sets the name to listen for with requests
     ErrorLog /var/log/httpd/proxy-error.log
     CustomLog /var/log/httpd/proxy-access.log common
@@ -12,7 +12,7 @@
 </VirtualHost>
 
 <VirtualHost *:443>
-    ServerName proxy.{{hostname}}.sa.cs.ut.ee
+    ServerName proxy.{{dns_zone}}
     # ServerName sets the name to listen for with requests
     ErrorLog /var/log/httpd/proxy-error.log
     CustomLog /var/log/httpd/proxy-access.log common

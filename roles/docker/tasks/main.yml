@@ -55,7 +55,6 @@
     state: started
     enabled: true
 
-
 - name: Create docker directory
   file:
     path: /home/centos/flask_app

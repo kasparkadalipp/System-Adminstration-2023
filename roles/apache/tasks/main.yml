@@ -1,3 +1,19 @@
+- name: Create Wordpress virtual host conf
+  template:
+    src: wordpress.conf.j2
+    dest: /etc/httpd/conf.d/wordpress.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create Docker virtual host conf
+  template:
+    src: container-proxy.conf.j2
+    dest: /etc/httpd/conf.d/container-proxy.conf
+    owner: root
+    group: root
+    mode: '0644'
+
 # 3.1 Understanding DNS CNAME records (added to template)
 
 # 3.2 Virtual Web Hosts Using Apache Web Server
