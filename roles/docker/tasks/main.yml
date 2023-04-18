@@ -111,3 +111,11 @@
     owner: root
     group: root
     mode: '0644'
+
+- name: Create docker compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: /home/centos/docker-compose.yml
+    owner: root
+    group: root
+    mode: '0644'
