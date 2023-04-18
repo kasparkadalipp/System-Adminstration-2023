@@ -92,7 +92,7 @@
     group: root
     mode: "0755"
 
-- name: Update samba conf
+- name: Create scoringtestfile
   copy:
     src: scoringtestfile
     dest: /home/centos/scoringtestfile
