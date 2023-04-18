@@ -83,4 +83,22 @@
     state: started
     enabled: true
 
+- name: Download Minio
+  uri:
+    url: 'https://dl.min.io/client/mc/release/linux-amd64/mc'
+    method: GET
+    dest: /usr/bin//mc
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Update samba conf
+  copy:
+    src: scoringtestfile
+    dest: /home/centos/scoringtestfile
+    owner: root
+    group: root
+    mode: '0644'
+
 # smbpasswd -a scoring # password should be: 2daysuperadmin
+# smbpasswd -a centos
