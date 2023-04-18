@@ -5,6 +5,8 @@
     state: enabled
   with_items:
   - 5005
+  - 50080
+  - 58080
   notify:
   - Restart firewall
 
@@ -75,6 +77,37 @@
   copy:
     src: server.py
     dest: /home/centos/flask_app/server.py
+    owner: root
+    group: root
+    mode: '0644'
+
+# devops 
+
+- name:  Add Trivy repository setting
+  copy:
+    src: trivy.repo
+    dest: /etc/yum.repos.d/trivy.repo
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Yum install trivy
+  yum:
+    name: trivy
+    state: present
+
+- name: Create Traefik directory
+  file:
+    path: /etc/docker/
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name:  Add Traefik repository setting
+  copy:
+    src: traefik.toml
+    dest: /etc/docker/traefik.toml
     owner: root
     group: root
     mode: '0644'
