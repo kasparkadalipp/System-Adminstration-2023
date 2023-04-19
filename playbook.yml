@@ -10,9 +10,8 @@
   - domain_name: sa.cs.ut.ee
   - ip_address: 172.17.91.191
   - dns_serial_counter: 1
-  - docker_container_ip: 192.168.67.3
+  - docker_lab_container_ip: 192.168.67.3
 
-  # don't change
   - dns_zone: "{{hostname}}.sa.cs.ut.ee"
   - mysql_root_password: pass
   - dns_serial_counter_formatted: '{{ "%02d" | format(dns_serial_counter | int) }}'

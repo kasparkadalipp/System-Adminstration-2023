@@ -38,7 +38,7 @@
 #     description: docker repository
 #     enabled: true
 #     baseurl: https://download.docker.com/linux/centos/docker-ce.repo
-#     state: absent
+#     state: present
 
 - name: Install docker
   yum:
