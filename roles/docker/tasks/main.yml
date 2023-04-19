@@ -98,7 +98,7 @@
 
 - name: Create Traefik directory
   file:
-    path: /etc/docker/
+    path: /etc/traefik
     state: directory
     owner: root
     group: root
@@ -107,7 +107,7 @@
 - name:  Add Traefik repository setting
   copy:
     src: traefik.toml
-    dest: /etc/docker/traefik.toml
+    dest: /etc/traefik/traefik.toml
     owner: root
     group: root
     mode: '0644'
