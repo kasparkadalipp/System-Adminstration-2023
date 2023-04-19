@@ -31,6 +31,12 @@
     name: yum-utils
     state: present
 
+# # try this instead 
+# - name: Set up Docker repository
+#   get_url: 
+#     url: https://download.docker.com/linux/centos/docker-ce.repo
+#     dest: /etc/yum.remos.d/docer-ce.repo
+
 # doesn't work
 # - name: Set up Docker repository
 #   yum_repository:
