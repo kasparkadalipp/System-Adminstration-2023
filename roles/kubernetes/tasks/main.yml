@@ -1,0 +1,12 @@
+
+# curl -sfL https://get.k3s.io | sh -
+
+- name: Permit traffic on port
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: enabled
+  with_items:
+  - 6443
+  notify:
+  - Restart firewall

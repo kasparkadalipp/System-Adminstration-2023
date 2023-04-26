@@ -26,12 +26,17 @@
   # - { role: etais, tags: etais } 
   # - { role: dns, tags: dns }
   # - { role: apache, tags: apache}
+  
   # # mysql_secure_installation
   # - { role: wordpress, tags: apache}
   # - { role: email, tags: email} # Manually send e-mail for task
   # - { role: roundcube, tags: email}
   # - { role: tls, tags: tls}
   # - { role: filesystem, tags: filesystem}
+
   # sudo yum install -y yum-utils 
   # sudo yum-config-manager add-repo https://download.docker.com/linux/centos/docker-ce.repo
-  - { role: docker, tags: docker}
+  # - { role: docker, tags: docker}
+
+  # curl -sfL https://get.k3s.io | sh -
+  - { role: kubernetes, tags: kubernetes} 

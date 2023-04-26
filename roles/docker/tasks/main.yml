@@ -87,7 +87,7 @@
     group: root
     mode: '0644'
 
-# devops 
+############ DevOps  ######################
 
 - name:  Add Trivy repository setting
   copy:
@@ -122,6 +122,24 @@
   template:
     src: docker-compose.yml.j2
     dest: /home/centos/docker-compose.yml
+    owner: root
+    group: root
+    mode: '0644'
+
+############ Kubernetes  ######################
+
+- name: Create traefik-config directory
+  file:
+    path: /var/lib/rancher/k3s/server/manifests/
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name:  Security-hardening using mod_security
+  copy:
+    src: traefik-config.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
     owner: root
     group: root
     mode: '0644'
