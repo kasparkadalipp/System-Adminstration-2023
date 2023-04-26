@@ -59,7 +59,7 @@
  
 - name: Create .ini extensions file
   template:
-    src: "20-<extension-name>.ini.j2"
+    src: "20-extension-name.ini.j2"
     dest: "/etc/php.d/20-{{ item }}.ini"
     owner: root
     group: root
