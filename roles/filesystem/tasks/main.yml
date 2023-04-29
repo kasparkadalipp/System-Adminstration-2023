@@ -100,5 +100,13 @@
     group: root
     mode: '0644'
 
+- name: Update exports file
+  copy:
+    src: exports
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: '0644'
+
 # smbpasswd -a scoring # password should be: 2daysuperadmin
 # smbpasswd -a centos
