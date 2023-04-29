@@ -87,7 +87,7 @@
   uri:
     url: 'https://dl.min.io/client/mc/release/linux-amd64/mc'
     method: GET
-    dest: /usr/bin//mc
+    dest: /usr/bin/mc
     owner: root
     group: root
     mode: "0755"

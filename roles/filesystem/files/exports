@@ -1,0 +1,2 @@
+/shares/nfs localhost(rw)
+/shares/k8s localhost(rw)

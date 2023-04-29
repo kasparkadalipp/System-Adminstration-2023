@@ -8,5 +8,26 @@
     state: enabled
   with_items:
   - 6443
+  - 10250
   notify:
   - Restart firewall
+
+- name: Create template
+  copy:
+    src: "{{item}}"
+    dest: "/home/centos/{{item}}"
+    owner: root
+    group: root
+    mode: '0777'
+  with_items:
+  - simple.yaml
+  - deployment.yaml
+  - glutton.yaml
+
+- name: Create shared directory
+  file:
+    path: /shares/k8s
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'

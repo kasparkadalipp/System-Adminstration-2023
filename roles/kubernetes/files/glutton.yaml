@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: glutton
+  name: glutton
+  namespace: resource-mgt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: glutton
+  template:
+    metadata:
+      labels:
+        app: glutton
+    spec:
+      containers:
+      - image: vish/stress
+        imagePullPolicy: Always
+        name: stress
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        args:
+        - -cpus
+        - "2"
+        - -mem-total
+        - "70Mi"
+        - -mem-alloc-size
+        - "60Mi"
+        - -mem-alloc-sleep
+        - "1s"
+        resources:
+          limits: # upper limit
+            cpu: "80m"
+            memory: "70Mi"
+          requests: # lower limit
+            cpu: "10m"
+            memory: "20Mi"
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

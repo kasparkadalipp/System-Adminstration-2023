@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hw1-deployment
+  namespace: lab11
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hw1
+  template:
+    metadata:
+      labels:
+        app: hw1
+    spec:
+      containers:
+        - name: hw1
+          image: registry.hpc.ut.ee/sysadmincourse-dev/hello-world:1.0
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 5000
