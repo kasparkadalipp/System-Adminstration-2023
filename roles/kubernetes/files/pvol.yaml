@@ -1,4 +1,18 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: vols
+  labels:
+    name: vols
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab11
+  labels:
+    name: lab11
+---
+apiVersion: v1
 kind: PersistentVolume
 metadata:
     name: pvol-lab11
@@ -54,3 +68,30 @@ spec:
       - name: nfs-vol
         persistentVolumeClaim:
           claimName: pvc-lab11
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pvol-service
+  namespace: lab11
+spec:
+  ports:
+  - port: 80
+    targetPort: 5000
+    protocol: TCP
+  selector:
+    app: pod-that-writes
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: lab11
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  defaultBackend:
+    service:
+      name: pvol-service
+      port:
+        number: 80
