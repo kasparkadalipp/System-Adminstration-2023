@@ -26,8 +26,11 @@
 
 - name: Create shared directory
   file:
-    path: /shares/k8s
+    path: "{{item}}"
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: '0777'
+  with_items:
+  - /mnt/k8s
+  - /shares/k8s

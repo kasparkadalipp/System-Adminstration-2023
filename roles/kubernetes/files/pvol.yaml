@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: pvol-lab11
+    namespace: vols
+spec:
+    capacity:
+        storage: 200Mi
+    accessModes:
+        - ReadWriteOnce
+    storageClassName: nfs
+    persistentVolumeReclaimPolicy: Retain
+    nfs:
+        path: /shares/k8s
+        server: b75914.sa.cs.ut.ee
+        readOnly: false
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: pvc-lab11
+    namespace: vols
+spec:
+    accessModes:
+    - ReadWriteOnce
+    volumeName: pvol-lab11
+    storageClassName: nfs
+    resources:
+        requests:
+            storage: 200Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: pvol-deployment
+    namespace: vols
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pod-that-writes
+  template:
+    metadata:
+      labels: 
+        app: pod-that-writes
+    spec:
+      containers:
+      - image: registry.hpc.ut.ee/sysadmincourse-dev/container_that_writes:1.0
+        name: pod-that-writes
+        volumeMounts:
+        - name: nfs-vol
+          mountPath: /opt/k8s
+      volumes:
+      - name: nfs-vol
+        persistentVolumeClaim:
+          claimName: pvc-lab11
