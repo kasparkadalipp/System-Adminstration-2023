@@ -37,6 +37,7 @@
   - glutton.yaml
   - bucket.yaml
   - pvol.yaml
+  - laptop-configmap.yaml
 
 - name: Create shared directory
   file:
