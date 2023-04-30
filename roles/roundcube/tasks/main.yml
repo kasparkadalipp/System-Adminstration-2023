@@ -127,3 +127,11 @@
     owner: apache
     group: apache
     mode: '0755'
+
+- name: Create Roundcube config
+  copy:
+    src: config.inc.php
+    dest: /var/www/html/roundcubemail/config.inc.php
+    owner: apache
+    group: apache
+    mode: '0755'
