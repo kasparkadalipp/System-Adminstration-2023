@@ -5,22 +5,21 @@
     state: enabled
   with_items:
   - 514
-  - 3000
+  - 30000
   - 30310
   - 30909
   - 30910
   notify:
   - Restart firewall
 
-- name: Create rsyslog log file
-  file:
-    path: /etc/rsyslog.d/01-receiving.conf
+- name: Create 01-receiving.conf
+  copy:
+    src: 01-receiving.conf
+    dest: /etc/rsyslog.d/01-receiving.conf
     owner: root
     group: root
     mode: '0644'
-    access_time: preserve
-    modification_time: preserve 
-    state: touch
+  notify: Restart rsyslog
 
 - name: Edit rsyslog.conf
   copy:
