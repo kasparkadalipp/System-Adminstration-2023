@@ -1,0 +1,38 @@
+- name: Permit traffic on port
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: enabled
+  with_items:
+  - 514
+  - 3000
+  - 30310
+  - 30909
+  - 30910
+  notify:
+  - Restart firewall
+
+- name: Create rsyslog log file
+  file:
+    path: /etc/rsyslog.d/01-receiving.conf
+    owner: root
+    group: root
+    mode: '0644'
+    access_time: preserve
+    modification_time: preserve 
+    state: touch
+
+- name: Edit rsyslog.conf
+  copy:
+    src: rsyslog.conf
+    dest: /etc/rsyslog.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart rsyslog
+
+- name: Ensure rsyslog service is running
+  systemd:
+    name: rsyslog
+    state: started
+    enabled: true

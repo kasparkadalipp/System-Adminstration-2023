@@ -39,4 +39,5 @@
   # - { role: docker, tags: docker}
 
   # curl -sfL https://get.k3s.io | sh -
-  - { role: kubernetes, tags: kubernetes} 
+  # - { role: kubernetes, tags: kubernetes} 
+  - { role: monitoring, tags: monitoring} 
