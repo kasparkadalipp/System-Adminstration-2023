@@ -1,6 +1,12 @@
 
 # curl -sfL https://get.k3s.io | sh -
 
+- name: Ensure Kubernetes service is running
+  systemd:
+    name: k3s
+    state: started
+    enabled: true
+
 - name: Permit traffic on port
   firewalld:
     port: "{{ item }}/tcp"
