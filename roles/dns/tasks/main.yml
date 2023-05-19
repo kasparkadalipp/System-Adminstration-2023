@@ -98,7 +98,7 @@
   - zone_transfers
   - client_security
   - queries
-  - query-errorsetc/named/b75914Update /etc/
+  - query-errorsetc/named/b75914kUpdate /etc/
 
 # Creating a Personal Domain for named
 
@@ -129,7 +129,7 @@
 - name: Creating a Personal Domain for named {{dns_zone}}
   template:
     src: b75914.sa.cs.ut.ee.j2
-    dest: /etc/named/{{hostname}}.sa.cs.ut.ee
+    dest: /etc/named/{{hostname}}.{{domain_name}}
     owner: root
     group: named
     mode: '0644'

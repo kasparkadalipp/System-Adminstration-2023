@@ -52,7 +52,7 @@ $config['log_dir'] = '/var/log/roundcube';
 $config['des_key'] = 'DwMaPaLjvp0UkGMJrrQRHrgJ';
 
 // Name your service. This is displayed on the login screen and in the window title
-$config['product_name'] = 'Webmail - b75914.sa.cs.ut.ee';
+$config['product_name'] = 'Webmail - b75914k.sysadexam.cs.ut.ee';
 
 // ----------------------------------
 // PLUGINS

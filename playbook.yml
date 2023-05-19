@@ -6,13 +6,13 @@
    - name: Global handlers
      import_tasks: handlers/restarts.yml
   vars:
-  - hostname: b75914
-  - domain_name: sa.cs.ut.ee
-  - ip_address: 172.17.91.191
-  - dns_serial_counter: 1
+  - hostname: k
+  - domain_name: sysadexam.cs.ut.ee
+  - ip_address: 172.17.91.42
+  - dns_serial_counter: 2
   - docker_lab_container_ip: 192.168.67.3
 
-  - dns_zone: "{{hostname}}.sa.cs.ut.ee"
+  - dns_zone: "{{hostname}}.sysadexam.cs.ut.ee"
   - mysql_root_password: pass
   - dns_serial_counter_formatted: '{{ "%02d" | format(dns_serial_counter | int) }}'
   - dns_serial: "{{'%Y%m%d' | strftime(ansible_date_time.epoch) }}{{dns_serial_counter}}"
@@ -23,21 +23,31 @@
      msg: Hello
 
   roles:
-  # - { role: etais, tags: etais } 
-  # - { role: dns, tags: dns }
-  # - { role: apache, tags: apache}
+
+  ## Console password:
+  ## Before runing become root user: * $ sudo su - As a root user set the password for the root account: * # passwd root
+
+  ## Note: remember to restart machine after changing hostname
+  - { role: etais, tags: etais } 
+  - { role: dns, tags: dns }
+  - { role: apache, tags: apache}
   
-  # # mysql_secure_installation
-  # - { role: wordpress, tags: apache}
-  # - { role: email, tags: email} # Manually send e-mail for task
-  # - { role: roundcube, tags: email}
-  # - { role: tls, tags: tls}
-  # - { role: filesystem, tags: filesystem}
+  # # # mysql_secure_installation
+  - { role: wordpress, tags: apache}
+  - { role: email, tags: email} # Manually send e-mail for task
+  - { role: roundcube, tags: email}
+  - { role: tls, tags: tls}
+  - { role: filesystem, tags: filesystem}
 
   # sudo yum install -y yum-utils 
   # sudo yum-config-manager add-repo https://download.docker.com/linux/centos/docker-ce.repo
-  # - { role: docker, tags: docker}
+  - { role: docker, tags: docker}
 
-  # curl -sfL https://get.k3s.io | sh -
-  # - { role: kubernetes, tags: kubernetes} 
+  # # curl -sfL https://get.k3s.io | sh -
+  - { role: kubernetes, tags: kubernetes} 
   - { role: monitoring, tags: monitoring} 
+
+
+  # - { role: tier1, tags: tier1} 
+  # - { role: tier2, tags: tier2} 
+  # - { role: tier3, tags: tier3} 

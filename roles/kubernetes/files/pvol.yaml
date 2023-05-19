@@ -12,7 +12,7 @@ spec:
     persistentVolumeReclaimPolicy: Retain
     nfs:
         path: /shares/k8s
-        server: b75914.sa.cs.ut.ee
+        server: "b75914k.{{domain_name}}"
         readOnly: false
 ---
 apiVersion: v1
