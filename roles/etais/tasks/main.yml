@@ -1,3 +1,9 @@
+- name: Ensure ssh is running
+  systemd:
+    name: sshd
+    state: started
+    enabled: true
+
 - name: Add user scoring
   user:
     name: scoring
